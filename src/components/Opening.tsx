@@ -1,8 +1,9 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { site } from "../config/site.config";
 import { Picture } from "./Picture";
+import { Atmosphere } from "./Atmosphere";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,6 +22,55 @@ export function Opening() {
   const cue = useRef<HTMLDivElement>(null);
   const shade = useRef<HTMLDivElement>(null);
   const caps = useRef<(HTMLDivElement | null)[]>([]);
+  const spot = useRef<HTMLDivElement>(null);
+  const atmo = useRef<HTMLDivElement>(null);
+  const [small, setSmall] = useState(() => window.matchMedia("(max-width: 760px)").matches);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 760px)");
+    const on = () => setSmall(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+
+  // Luz que segue o rato (ou passeia sozinha em ecrãs tácteis) e revela a textura.
+  useEffect(() => {
+    const el = spot.current;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const cur = { x: 0.7, y: 0.45 };
+    const tgt = { x: 0.7, y: 0.45 };
+    let pointer = false;
+    let raf = 0;
+    let t = 0;
+    const move = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return;
+      pointer = true;
+      tgt.x = e.clientX / window.innerWidth;
+      tgt.y = e.clientY / window.innerHeight;
+    };
+    const leave = () => (pointer = false);
+    const loop = () => {
+      raf = requestAnimationFrame(loop);
+      if (window.scrollY > window.innerHeight * 0.9) return;
+      t += 0.016;
+      if (!pointer) {
+        tgt.x = 0.55 + 0.25 * Math.sin(t * 0.45);
+        tgt.y = 0.5 + 0.12 * Math.sin(t * 0.31 + 1);
+      }
+      cur.x += (tgt.x - cur.x) * 0.06;
+      cur.y += (tgt.y - cur.y) * 0.06;
+      el.style.setProperty("--mx", `${(cur.x * 100).toFixed(2)}%`);
+      el.style.setProperty("--my", `${(cur.y * 100).toFixed(2)}%`);
+    };
+    window.addEventListener("pointermove", move, { passive: true });
+    document.documentElement.addEventListener("pointerleave", leave);
+    raf = requestAnimationFrame(loop);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("pointermove", move);
+      document.documentElement.removeEventListener("pointerleave", leave);
+    };
+  }, []);
 
   useLayoutEffect(() => {
     const mm = gsap.matchMedia();
@@ -53,6 +103,8 @@ export function Opening() {
             0,
           )
           .to(shade.current, { opacity: 1, duration: 0.25 }, 0.05)
+          .to(atmo.current, { opacity: 0, duration: 0.22 }, 0.04)
+          .to(spot.current, { opacity: 0, duration: 0.18 }, 0.3)
           .to(lit.current, { opacity: 1, duration: 0.5, ease: "power1.inOut" }, 0.28)
           .fromTo(beam.current, { xPercent: -60, opacity: 0 }, { xPercent: 60, duration: 0.6, ease: "power1.inOut" }, 0.22)
           .to(beam.current, { opacity: 0.9, duration: 0.2, yoyo: true, repeat: 1 }, 0.22);
@@ -77,10 +129,16 @@ export function Opening() {
       <div className="opening__sticky">
         <div className="opening__media" ref={media}>
           <Picture img={hero.images.dark} className="opening__img" eager />
+          <div className="opening__spot" ref={spot} aria-hidden="true">
+            <Picture img={hero.images.lit} className="opening__img" decorative eager />
+          </div>
           <div className="opening__lit" ref={lit}>
             <Picture img={hero.images.lit} className="opening__img" eager />
           </div>
           <div className="opening__beam" ref={beam} aria-hidden="true" />
+          <div className="opening__atmo" ref={atmo}>
+            <Atmosphere origin={small ? hero.smoke.mobile : hero.smoke.desktop} />
+          </div>
         </div>
         <div className="opening__vignette" aria-hidden="true" />
         <div className="opening__shade" ref={shade} aria-hidden="true" />

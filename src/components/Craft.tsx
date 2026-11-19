@@ -32,8 +32,8 @@ export function Craft() {
           <p className="kicker">{c.kicker}</p>
           <h2 id="oficio-titulo" className="sec-title">
             {c.title.map((l, i) => (
-              <span key={l} className={i > 0 ? "sec-title__soft" : undefined}>
-                {l}
+              <span key={l} className={`ln${i > 0 ? " sec-title__soft" : ""}`}>
+                <span style={{ ["--d" as string]: `${i * 0.12}s` }}>{l}</span>
               </span>
             ))}
           </h2>

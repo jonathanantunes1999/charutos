@@ -22,6 +22,8 @@ export type Product = {
   /** 1–3, alimenta o medidor de intensidade */
   intensity: 1 | 2 | 3;
   line: string;
+  /** cor ambiente da secção quando este charuto está selecionado */
+  accent: string;
   notes: string[];
   details: { label: string; value: string }[];
   image: Img;
@@ -48,6 +50,8 @@ export const site = {
     lede: "Folha, ligação e capa, vistos de muito perto.",
     cta: { label: "Descobrir a coleção", href: "#colecao" },
     scrollCue: "Scroll",
+    /** ponto de onde sai o fumo (fração do ecrã) */
+    smoke: { desktop: { x: 0.77, y: 0.3 }, mobile: { x: 0.76, y: 0.28 } },
     /** O mesmo charuto em duas luzes: sombra → luz aberta (usadas na transição por scroll). */
     images: {
       dark: {
@@ -71,6 +75,11 @@ export const site = {
     ],
   },
 
+  statement: {
+    text: "Um charuto não se despacha. Lê-se devagar, camada a camada, da capa ao coração.",
+    band: ["Folha", "Ligação", "Capa", "Tempo"],
+  },
+
   collection: {
     id: "colecao",
     kicker: "02 — Coleção",
@@ -86,6 +95,7 @@ export const site = {
         profile: "Suave",
         intensity: 1,
         line: "Abre devagar, sem pressa e sem peso.",
+        accent: "#d9a85c",
         notes: ["Mel claro", "Cedro", "Amêndoa tostada"],
         details: [
           { label: "Capa", value: "Dourado claro, veia fina" },
@@ -106,6 +116,7 @@ export const site = {
         profile: "Médio",
         intensity: 2,
         line: "Equilíbrio entre doçura e carácter.",
+        accent: "#b8602c",
         notes: ["Cacau", "Couro", "Especiarias doces"],
         details: [
           { label: "Capa", value: "Castanho avermelhado" },
@@ -126,6 +137,7 @@ export const site = {
         profile: "Intenso",
         intensity: 3,
         line: "Escuro, denso e demorado.",
+        accent: "#8a3a22",
         notes: ["Café negro", "Madeira queimada", "Pimenta"],
         details: [
           { label: "Capa", value: "Quase negra, oleosa" },

@@ -62,14 +62,20 @@ export function Collection() {
   const p = c.products[active];
 
   return (
-    <section id={c.id} className="collection section" aria-labelledby="colecao-titulo" tabIndex={-1}>
+    <section
+      id={c.id}
+      className="collection section"
+      aria-labelledby="colecao-titulo"
+      tabIndex={-1}
+      style={{ ["--accent" as string]: p.accent }}
+    >
       <div className="wrap">
         <header className="sec-head" data-reveal>
           <p className="kicker">{c.kicker}</p>
           <h2 id="colecao-titulo" className="sec-title">
             {c.title.map((l, i) => (
-              <span key={l} className={i === 1 ? "sec-title__soft" : undefined}>
-                {l}
+              <span key={l} className={`ln${i === 1 ? " sec-title__soft" : ""}`}>
+                <span style={{ ["--d" as string]: `${i * 0.12}s` }}>{l}</span>
               </span>
             ))}
           </h2>

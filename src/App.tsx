@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { site } from "./config/site.config";
 import { Header } from "./components/Header";
 import { Opening } from "./components/Opening";
+import { Statement } from "./components/Statement";
 import { Collection } from "./components/Collection";
 import { Craft } from "./components/Craft";
 import { Closing } from "./components/Closing";
@@ -23,6 +24,7 @@ export default function App() {
       <Header />
       <main>
         <Opening />
+        <Statement />
         <Collection />
         <Craft />
         <Closing />
