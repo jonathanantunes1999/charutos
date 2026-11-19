@@ -29,16 +29,20 @@ Logótipo real: substituir `src/components/Wordmark.tsx` por um `<svg>`.
 
 ### Imagens (`public/images/`)
 
-**Não são fotografias**: são renders procedurais (`scripts/generate_images.py`), sem direitos de terceiros. São placeholders.
+Vêm todas de **uma única fotografia** (`assets/source/cigar-unsplash.jpg`, de Fabian Garcia Acevedo, via Unsplash; licença Unsplash), processada por `scripts/process_photo.py`:
+
+1. a **anilha** da marca é removida (reconstrução da capa com a textura do próprio charuto);
+2. o charuto é **recortado** com fundo transparente (cabeça à esquerda, pé à direita);
+3. os três perfis (`cut-claro`, `cut-ambar`, `cut-noite`) são **o mesmo charuto com correção de cor**, só para validar o conceito; `cut-hero` é o original;
+4. os macros (`folha`, `hero-lit`, `estrutura`, `acabamento`) e o fecho (`fecho`) são recortes da fotografia.
 
 | Tipo | Ficheiros | Notas |
 | --- | --- | --- |
-| **Recortes** (PNG/WebP com transparência) | `cut-hero`, `cut-claro`, `cut-ambar`, `cut-noite` (+ `-sm`) | Charuto **inteiro**, na horizontal, **cabeça à esquerda e pé à direita**, fundo transparente, ≈ 2400×450. Quanto mais o recorte for limpo, melhor. |
-| **Macro** | `folha`, `hero-lit`, `estrutura`, `acabamento`, `fecho` (+ `-sm`) | Fotografias com fundo. `focus` em `craft.steps` escolhe o ponto de corte. |
+| **Recortes** (WebP com transparência) | `cut-hero`, `cut-claro`, `cut-ambar`, `cut-noite` (+ `-sm`) | Charuto **inteiro**, na horizontal, **ponta à esquerda e extremo plano à direita**, fundo transparente. |
+| **Macro / fotografia** | `folha` (+ `folha-sm` vertical), `hero-lit`, `estrutura`, `acabamento`, `fecho` | `focus` em `craft.steps` escolhe o ponto de corte. |
 
-Com fotografias reais, o ideal é fotografar cada charuto isolado em fundo liso (ou recortar) e exportar WebP com transparência.
-
-Regenerar placeholders: `pip install numpy scipy pillow && python3 scripts/generate_images.py [nome …]`.
+Quando houver fotografias oficiais de cada charuto, basta substituir os ficheiros mantendo os nomes (ou alterar os caminhos no config).
+Reprocessar: `pip install numpy pillow opencv-python-headless && python3 scripts/process_photo.py [outra-foto.jpg]` (os pontos de reparação e recorte estão ajustados a esta fotografia).
 
 ## Notas
 

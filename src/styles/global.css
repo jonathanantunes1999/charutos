@@ -325,7 +325,7 @@ body::after {
 }
 .hero__foot {
   position: absolute;
-  right: 2.4%;
+  right: 1.5%;
   top: 50%;
   width: 1px;
   height: 1px;
@@ -613,7 +613,7 @@ body::after {
 }
 .coll__cigar {
   position: absolute;
-  left: 67%;
+  left: 68%;
   top: 50%;
   width: 66vw;
   transform: translate(-50%, -50%) rotate(-12deg);
@@ -1025,18 +1025,18 @@ body::after {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 64%;
+  height: 52%;
 }
 .end__bg img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 72% 50%;
+  object-position: 60% 50%;
 }
 .end__shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, var(--ink) 0%, var(--ink) 30%, rgba(10, 8, 7, 0.2) 62%, rgba(10, 8, 7, 0.55) 100%);
+  background: linear-gradient(180deg, var(--ink) 0%, var(--ink) 40%, rgba(10, 8, 7, 0.15) 66%, rgba(10, 8, 7, 0.5) 100%);
 }
 .end__giant {
   position: relative;
@@ -1057,7 +1057,7 @@ body::after {
 }
 .end__giant span {
   padding: 0.12em 0.04em 0;
-  font-size: min(34vw, 56svh);
+  font-size: min(30vw, 46svh);
   font-weight: 200;
   font-variation-settings: "opsz" 144;
   letter-spacing: 0.01em;
@@ -1138,7 +1138,7 @@ body::after {
   }
   .coll__cigar {
     left: 50%;
-    width: 108vw;
+    width: 112vw;
     transform: translate(-50%, -50%) rotate(-20deg);
   }
   @keyframes cigar-in {

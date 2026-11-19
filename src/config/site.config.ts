@@ -53,7 +53,7 @@ export const site = {
     cutout: {
       src: "images/cut-hero.webp",
       srcSm: "images/cut-hero-sm.webp",
-      alt: "Charuto de capa castanha, com veias finas e luz lateral, em diagonal sobre fundo escuro.",
+      alt: "Charuto torpedo de capa escura e castanha, com textura de folha visível, em diagonal sobre fundo escuro.",
     } satisfies Img,
   },
 
@@ -63,7 +63,7 @@ export const site = {
     image: {
       src: "images/folha.webp",
       srcSm: "images/folha-sm.webp",
-      alt: "Macro de uma folha de tabaco sob luz rasante, com veias em relevo.",
+      alt: "Macro da capa de um charuto, a passar do castanho escuro ao cobre, com a textura da folha.",
     } satisfies Img,
     notes: [
       { n: "01", t: "Veias", d: "Caminhos finos, em relevo." },
@@ -98,7 +98,7 @@ export const site = {
         cutout: {
           src: "images/cut-claro.webp",
           srcSm: "images/cut-claro-sm.webp",
-          alt: "Charuto de capa dourada clara, inteiro, com a cabeça arredondada à esquerda.",
+          alt: "Charuto torpedo de capa dourada clara, inteiro, com a ponta à esquerda.",
         },
       },
       {
@@ -120,7 +120,7 @@ export const site = {
         cutout: {
           src: "images/cut-ambar.webp",
           srcSm: "images/cut-ambar-sm.webp",
-          alt: "Charuto de capa castanha avermelhada, inteiro, com veias visíveis.",
+          alt: "Charuto torpedo de capa castanha avermelhada, inteiro, com textura visível.",
         },
       },
       {
@@ -142,7 +142,7 @@ export const site = {
         cutout: {
           src: "images/cut-noite.webp",
           srcSm: "images/cut-noite-sm.webp",
-          alt: "Charuto de capa quase negra, inteiro, com brilho discreto nas veias.",
+          alt: "Charuto torpedo de capa quase negra, inteiro.",
         },
       },
     ] satisfies Product[],
@@ -161,9 +161,9 @@ export const site = {
         image: {
           src: "images/hero-lit.webp",
           srcSm: "images/hero-lit-m.webp",
-          alt: "Charuto sob luz aberta, com a textura da capa em evidência.",
+          alt: "Macro da capa de um charuto, com uma fissura na folha e a transição do escuro para o cobre.",
         } satisfies Img,
-        focus: "46% 60%",
+        focus: "50% 50%",
       },
       {
         number: "II",
@@ -172,9 +172,9 @@ export const site = {
         image: {
           src: "images/estrutura.webp",
           srcSm: "images/estrutura-sm.webp",
-          alt: "Macro do pé de um charuto, onde se distinguem o enchimento, a ligação e a capa.",
+          alt: "Macro do extremo cortado de um charuto, onde a capa se dobra sobre o corpo.",
         } satisfies Img,
-        focus: "0% 50%",
+        focus: "50% 50%",
       },
       {
         number: "III",
@@ -183,9 +183,9 @@ export const site = {
         image: {
           src: "images/acabamento.webp",
           srcSm: "images/acabamento-sm.webp",
-          alt: "Macro da capa de um charuto em espiral, com veias e luz rasante.",
+          alt: "Macro da ponta pontiaguda de um charuto torpedo.",
         } satisfies Img,
-        focus: "70% 70%",
+        focus: "50% 50%",
       },
     ],
     note: "Descrição geral do ofício. Os processos próprios da marca entram quando houver materiais oficiais.",
@@ -195,7 +195,7 @@ export const site = {
     image: {
       src: "images/fecho.webp",
       srcSm: "images/fecho-sm.webp",
-      alt: "Charuto pousado numa superfície escura, com reflexo suave.",
+      alt: "Charuto torpedo pousado sobre um copo de bebida escura, vista de cima, em madeira escura.",
     } satisfies Img,
     line: "O detalhe revela-se devagar.",
     toTop: { label: "Voltar ao topo", href: "#topo" },
