@@ -49,7 +49,6 @@ export const site = {
     eyebrow: "Charutos — conceito de coleção",
     titleLines: ["O detalhe", "revela-se", "devagar."],
     cta: { label: "Descobrir a coleção", href: "#colecao" },
-    scrollCue: "Scroll",
     cutout: {
       src: "images/cut-hero.webp",
       srcSm: "images/cut-hero-sm.webp",

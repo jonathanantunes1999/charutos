@@ -51,10 +51,6 @@ export function Craft() {
               {c.title}
             </h2>
             <p className="craft__lede">{c.intro}</p>
-            <p className="craft__swipe" aria-hidden="true">
-              <span>Scroll</span>
-              <i />
-            </p>
           </div>
 
           {c.steps.map((s, i) => (

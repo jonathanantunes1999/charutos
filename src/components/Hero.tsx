@@ -34,7 +34,7 @@ export function Hero() {
           .from(q(".g-l > span"), { yPercent: 118, duration: 1.7, stagger: 0.12 }, 0.05)
           .from(q(".hero__rot"), { xPercent: small ? 10 : 42, yPercent: small ? 30 : 0, rotate: base - (small ? 18 : 16), autoAlpha: 0, duration: 2.1, ease: "power4.out" }, 0.15)
           .from(q(".hero__line > span"), { yPercent: 112, duration: 1.4, stagger: 0.1 }, 0.6)
-          .from(q(".hero__eyebrow, .hero__cue"), { opacity: 0, y: 14, duration: 1.2 }, 1)
+          .from(q(".hero__eyebrow"), { opacity: 0, y: 14, duration: 1.2 }, 1)
           .from(q(".badge"), { scale: 0, rotate: -120, duration: 1.4, ease: "back.out(1.5)" }, 1.1);
 
         // flutuação
@@ -68,7 +68,7 @@ export function Hero() {
           .to(q(".g-l")[2], { xPercent: 45, duration: 1 }, 0)
           .to(q(".g-l")[1], { yPercent: -35, opacity: 0.2, duration: 1 }, 0)
           .to(q(".hero__copy"), { y: -70, autoAlpha: 0, duration: 0.55 }, 0)
-          .to(q(".badge, .hero__cue"), { autoAlpha: 0, duration: 0.3 }, 0);
+          .to(q(".badge"), { autoAlpha: 0, duration: 0.3 }, 0);
 
         return () => off();
       },
@@ -121,10 +121,6 @@ export function Hero() {
 
       <Badge href={hero.cta.href} label={hero.cta.label} className="badge--hero" />
 
-      <p className="hero__cue" aria-hidden="true">
-        <span>{hero.scrollCue}</span>
-        <i />
-      </p>
     </section>
   );
 }
