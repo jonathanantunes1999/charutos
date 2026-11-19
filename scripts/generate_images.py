@@ -67,53 +67,82 @@ def ramp(t, pal):
 
 # ------------------------------------------------------- textura da folha
 def make_leaf_texture(seed, vs=1.0):
+    """Capa de charuto: superfície acetinada, veias esparsas e suaves, sardas, manchas de tom."""
     rng = np.random.default_rng(seed)
     shape = (TH, TW)
     S, U = np.mgrid[0:TH, 0:TW].astype(np.float32)
     S -= TH / 2
-    grain = 0.5 * g(shape, 1.5, 12, rng) + 0.3 * g(shape, 1, 5, rng) + 0.25 * g(shape, 5, 30, rng)
-    blot = g(shape, 40, 90, rng)
-    wa = g(shape, 70, 90, rng) * 26 * vs + g(shape, 14, 14, rng) * 3.5 * vs
-    wb = g(shape, 70, 90, rng) * 26 * vs + g(shape, 14, 14, rng) * 3.5 * vs
-    th = 0.6
+    # grão fino alinhado com a folha + "tooth" microscópico
+    grain = 0.22 * g(shape, 1.2, 7, rng) + 0.4 * g(shape, 1.1, 1.8, rng) + 0.3 * g(shape, 5, 9, rng)
+    tooth = g(shape, 0.8, 0.8, rng)
+    blot = g(shape, 60, 130, rng)
+    blot2 = g(shape, 22, 46, rng)
+    # curvas lentas e grandes: as veias não são retas nem paralelas
+    wa = g(shape, 120, 150, rng) * 38 * vs + g(shape, 30, 30, rng) * 6 * vs
+    wb = g(shape, 120, 150, rng) * 38 * vs + g(shape, 30, 30, rng) * 6 * vs
+    th = 0.62
     c, s = np.cos(th), np.sin(th)
     Uw, Sw = U + wa, S + wb
     P = Uw * c + Sw * s
     Q = -Uw * s + Sw * c
-    per = 900 * vs
+    per = 1500 * vs
     Qm = ((Q + per / 2) % per) - per / 2
-    d = 52 * vs * (1 + 0.28 * g(shape, 160, 160, rng))
-    ph = (P - np.abs(Qm) * 0.62 + 0.0009 * Qm**2 / vs) / d
+    # veias secundárias: espaçamento largo e irregular (≈ 4-5 por diâmetro de charuto)
+    d = 175 * vs
+    ph = (P - np.abs(Qm) * 0.7 + 0.0004 * Qm**2 / vs) / d + 0.42 * g(shape, 240, 240, rng)
     dist = np.abs(ph - np.round(ph)) * d
-    vein = np.exp(-((dist / (2.1 * vs)) ** 2)) * (1 - 0.55 * np.abs(Qm) / (per / 2)) * (0.6 + 0.4 * np.clip(0.5 + 0.5 * g(shape, 60, 60, rng), 0, 1))
-    rib = np.exp(-((Qm / (15 * vs)) ** 2))
-    r1 = np.clip(1 - np.abs(g(shape, 2.2, 2.2, rng)) / 1.1, 0, 1) ** 3
-    r2 = np.clip(1 - np.abs(g(shape, 6, 6, rng)) / 1.2, 0, 1) ** 3
+    fade = (1 - 0.6 * np.abs(Qm) / (per / 2)) * (0.55 + 0.45 * np.clip(0.5 + 0.5 * g(shape, 150, 150, rng), 0, 1))
+    vein = np.exp(-((dist / (4.2 * vs)) ** 2)) * fade
+    # veias terciárias: ramificações mais finas e fracas, intercaladas
+    ph2 = (P - np.abs(Qm) * 0.55 + 0.0004 * Qm**2 / vs + 0.5 * d) / (d * 0.46) + 0.5 * g(shape, 160, 160, rng)
+    dist2 = np.abs(ph2 - np.round(ph2)) * d * 0.46
+    vein2 = np.exp(-((dist2 / (2.4 * vs)) ** 2)) * fade * np.clip(0.5 + 0.9 * g(shape, 90, 90, rng), 0, 1)
+    rib = np.exp(-((Qm / (26 * vs)) ** 2)) * (0.6 + 0.4 * np.clip(0.5 + 0.5 * g(shape, 400, 60, rng), 0, 1))
+    r2 = np.clip(1 - np.abs(g(shape, 9, 9, rng)) / 1.2, 0, 1) ** 4
     edge = Q % per
-    seam = np.exp(-((edge / 7) ** 2)) + 0.5 * np.exp(-(((per - edge) / 7) ** 2))
-    H = 0.75 * vein + 0.9 * rib + 0.2 * r1 + 0.28 * r2 + 0.12 * grain + 0.55 * seam
-    T = 0.5 + 0.17 * grain + 0.15 * blot + 0.12 * vein + 0.18 * rib - 0.1 * r2 - 0.12 * seam
-    Hs = gaussian_filter(H, 0.6)
+    seam = np.exp(-((edge / 6) ** 2)) + 0.45 * np.exp(-(((per - edge) / 9) ** 2))
+    H = 0.75 * vein + 0.34 * vein2 + 0.5 * rib + 0.1 * r2 + 0.06 * grain + 0.06 * tooth + 0.45 * seam
+    # sardas e pontos escuros (típicos de capa natural)
+    sp = g(shape, 1.5, 1.5, rng)
+    freckles = np.clip(sp - 2.1, 0, 1)
+    dark = np.clip(g(shape, 2.2, 2.2, rng) - 2.4, 0, 1)
+    T = (0.5 + 0.05 * grain + 0.11 * blot + 0.085 * blot2 + 0.1 * vein + 0.06 * vein2 + 0.07 * rib
+         - 0.35 * dark + 0.2 * freckles - 0.07 * seam)
+    Hs = gaussian_filter(H, 0.9)
     Hu = np.gradient(Hs, axis=1)
     Hv = np.gradient(Hs, axis=0)
-    Hn = np.clip((H - H.min()) / (np.percentile(H, 99.5) - H.min()), 0, 1)
+    Hn = np.clip((H - H.min()) / (np.percentile(H, 99.7) - H.min()), 0, 1)
     return dict(Hu=Hu.astype(np.float32), Hs=Hv.astype(np.float32), T=T.astype(np.float32), Hn=Hn.astype(np.float32))
 
 
 def make_face_texture(seed, n=2400):
+    """Pé do charuto: folhas de enchimento enroladas, fibras curvas, vazios escuros."""
+    from scipy.ndimage import rotate
+
     rng = np.random.default_rng(seed + 99)
     sh = (n, n)
-    rid = lambda sy, sx: np.clip(1 - np.abs(g(sh, sy, sx, rng)) / 1.15, 0, 1) ** 2
-    Hf = 0.6 * rid(3, 3) + 0.45 * rid(9, 9) + 0.25 * rid(22, 22) + 0.2 * g(sh, 2, 2, rng)
-    Hf = (Hf - Hf.min()) / (Hf.max() - Hf.min())
-    Tf = 0.5 + 0.22 * g(sh, 14, 14, rng) + 0.16 * g(sh, 3, 3, rng)
-    Of = g(sh, 30, 30, rng)  # variação de tom oliva/avermelhado
-    Hg = gaussian_filter(Hf, 0.7)
+    ang = g(sh, 110, 110, rng) * 1.3  # direção local das fibras
+    ths = np.linspace(0, np.pi, 6, endpoint=False)
+    w = np.stack([np.exp(3.5 * np.cos(2 * (ang - t))) for t in ths])
+    w /= w.sum(0, keepdims=True)
+    field = np.zeros(sh, np.float32)
+    for t, wk in zip(ths, w):
+        base = g(sh, 9, 70, rng)
+        r = rotate(base, np.degrees(t), reshape=False, order=1, mode="reflect")
+        field += wk * np.clip(1 - np.abs(r) / 1.45, 0, 1) ** 1.3
+    folds = np.clip(1 - np.abs(g(sh, 16, 16, rng)) / 1.2, 0, 1) ** 2.5
+    gaps = smoothstep(0.9, 2.0, -g(sh, 40, 40, rng) - 0.3 * g(sh, 12, 12, rng))
+    Hf = 0.75 * field + 0.25 * folds
+    Hf = Hf / np.percentile(Hf, 99.5)
+    Hf = np.clip(Hf, 0, 1) * (1 - 0.75 * gaps)
+    Tf = 0.3 + 0.3 * Hf + 0.14 * g(sh, 30, 30, rng) + 0.05 * g(sh, 3, 3, rng)
+    Of = g(sh, 40, 40, rng)
+    Hg = gaussian_filter(Hf, 1.6)
     return dict(
         H=Hf.astype(np.float32),
         gx=np.gradient(Hg, axis=1).astype(np.float32),
         gy=np.gradient(Hg, axis=0).astype(np.float32),
-        T=Tf.astype(np.float32),
+        T=np.clip(Tf, 0, 1).astype(np.float32),
         O=Of.astype(np.float32),
     )
 
@@ -128,7 +157,7 @@ def norm(v):
     return v / np.linalg.norm(v)
 
 
-def render_cigar(W, H, f, tex, face, cx, cy, A_deg, R, pal, light, ts=1.0, q=0.42, k=3.2,
+def render_cigar(W, H, f, tex, face, cx, cy, A_deg, R, pal, light, ts=1.0, q=0.42, k=2.6,
                  face_pal=None, show_face=True, spec=0.22):
     """Devolve (rgb linear, alpha do corpo+face, dist. ao foco p/ DOF). Coordenadas em px 'ref' (f=escala)."""
     A = np.deg2rad(A_deg)
@@ -191,9 +220,9 @@ def render_cigar(W, H, f, tex, face, cx, cy, A_deg, R, pal, light, ts=1.0, q=0.4
         fcol = fcol * (1 + 0.12 * fo[..., None] * np.array([-0.5, 0.2, 0.9], np.float32))
         # anéis: ligante e capa
         ring_w = np.clip((re - 0.72) / 0.08, 0, 1)
-        wr = ramp(0.45 + 0.25 * np.sin(re * 95 + th_ * 1.3 + 3 * fo) * 0.5 + 0.12 * ft, pal)
-        wr_w = np.clip((re - 0.88) / 0.04, 0, 1)
-        binder = ramp(0.35 + 0.2 * np.sin(th_ * 9 + fo * 6) * 0.5 + 0.18 * ft, (pal[0], pal[1], pal[1]))
+        wr = ramp(0.36 + 0.05 * np.sin(re * 60 + 2 * fo) + 0.1 * ft, pal)
+        wr_w = np.clip((re - 0.9) / 0.05, 0, 1) * 0.85
+        binder = ramp(0.3 + 0.08 * np.sin(th_ * 5 + fo * 4) + 0.14 * ft, (pal[0], pal[1], pal[1]))
         fcol = fcol * (1 - ring_w[..., None]) + binder * ring_w[..., None]
         fcol = fcol * (1 - wr_w[..., None]) + wr * wr_w[..., None]
         # normal da face
@@ -211,6 +240,8 @@ def render_cigar(W, H, f, tex, face, cx, cy, A_deg, R, pal, light, ts=1.0, q=0.4
         fd2 = np.clip(fNx * Lr[0] + fNy * Lr[1] + fNz * Lr[2], 0, 1)
         cav = (0.08 + 0.92 * np.clip(fr * 1.35, 0, 1) ** 1.4) * (0.55 + 0.45 * np.clip(1.15 - re, 0, 1) ** 0.6)
         facec = fcol * (light["amb"] * 0.7 + fd1[..., None] * kc + fd2[..., None] * rc) * cav[..., None]
+        lum = facec.mean(-1, keepdims=True)
+        facec = lum + (facec - lum) * 0.6
         m = (inside * FA)[..., None]
         img = img * (1 - m) + facec * m
         alpha = np.maximum(alpha, inside * FA)
@@ -273,16 +304,16 @@ def finish(img, f, exposure=1.0, vignette=0.55, vg_center=(0.55, 0.5), shadow_gr
 
 # --------------------------------------------------------------- paletas
 PAL = {
-    "suave": [(0.42, 0.28, 0.11), (0.66, 0.47, 0.22), (0.82, 0.64, 0.36)],
-    "medio": [(0.22, 0.105, 0.05), (0.43, 0.22, 0.10), (0.62, 0.36, 0.17)],
+    "suave": [(0.33, 0.245, 0.135), (0.53, 0.415, 0.245), (0.68, 0.565, 0.375)],
+    "medio": [(0.16, 0.085, 0.048), (0.33, 0.185, 0.095), (0.50, 0.31, 0.165)],
     "intenso": [(0.06, 0.034, 0.02), (0.16, 0.082, 0.042), (0.31, 0.165, 0.085)],
-    "hero": [(0.20, 0.10, 0.05), (0.38, 0.205, 0.095), (0.55, 0.335, 0.165)],
+    "hero": [(0.15, 0.08, 0.045), (0.31, 0.175, 0.09), (0.47, 0.30, 0.16)],
 }
 FACE = {
-    "suave": [(0.12, 0.08, 0.04), (0.40, 0.28, 0.12), (0.64, 0.48, 0.24)],
-    "medio": [(0.09, 0.05, 0.03), (0.32, 0.19, 0.08), (0.55, 0.36, 0.17)],
-    "intenso": [(0.04, 0.025, 0.015), (0.16, 0.09, 0.05), (0.34, 0.2, 0.1)],
-    "hero": [(0.08, 0.05, 0.03), (0.30, 0.19, 0.085), (0.52, 0.35, 0.17)],
+    "suave": [(0.06, 0.05, 0.032), (0.28, 0.23, 0.14), (0.52, 0.44, 0.29)],
+    "medio": [(0.05, 0.04, 0.028), (0.22, 0.17, 0.105), (0.43, 0.35, 0.22)],
+    "intenso": [(0.04, 0.032, 0.022), (0.16, 0.12, 0.08), (0.33, 0.26, 0.17)],
+    "hero": [(0.05, 0.042, 0.03), (0.23, 0.19, 0.125), (0.45, 0.38, 0.26)],
 }
 
 LIGHT_SIDE = dict(key=(0.85, -0.38, 0.34), key_col=(1.0, 0.84, 0.66), key_i=3.0,
@@ -315,7 +346,7 @@ def scene_hero(tex, face, W, H, ref_w, lit, mobile, f_override=None):
         cx, cy, A, R = 0.74 * ref_w, 0.34 * ref_h, -66, 0.215 * ref_w
         glow_xy = (0.78, 0.35)
     light = dict(LIGHT_OPEN if lit else LIGHT_SIDE)
-    img, alpha, dist = render_cigar(W, H, f, tex, face, cx, cy, A, R, pal, light, ts=1.0, q=0.62,
+    img, alpha, dist = render_cigar(W, H, f, tex, face, cx, cy, A, R, pal, light, ts=1.0, q=0.8,
                                     face_pal=fpal)
     bg = background(W, H, f, alpha, glow_xy, glow=(0.05, 0.034, 0.022) if lit else (0.03, 0.02, 0.013),
                     shadow_off=(-60, 40) if not mobile else (-50, 30))
@@ -330,7 +361,7 @@ def scene_hero(tex, face, W, H, ref_w, lit, mobile, f_override=None):
                   vg_center=(0.65, 0.5) if not mobile else (0.7, 0.35), seed=5 if lit else 4)
 
 
-def scene_product(name, tex, face, W, H, ref_w, geo, light_scale=1.0, exposure=1.0, seed=10):
+def scene_product(name, tex, face, W, H, ref_w, geo, light_scale=1.0, exposure=1.0, seed=10, dof_r=(0.55, 1.3)):
     f = W / ref_w
     ref_h = H / f
     cx, cy, A, R, q = geo
@@ -341,7 +372,7 @@ def scene_product(name, tex, face, W, H, ref_w, geo, light_scale=1.0, exposure=1
                                     spec=0.08 if name == "intenso" else 0.22)
     bg = background(W, H, f, alpha, (0.7, 0.55), shadow_off=(-60, 40), seed=seed)
     out = img + bg * (1 - alpha[..., None])
-    out = dof(out, dist, f, 0.55 * ref_w, 1.3 * ref_w, 4, 10)
+    out = dof(out, dist, f, dof_r[0] * ref_w, dof_r[1] * ref_w, 4, 10)
     return finish(out, f, exposure=exposure, vignette=0.6, vg_center=(0.62, 0.5), seed=seed)
 
 
@@ -354,7 +385,7 @@ def scene_leaf(tex, W, H, ref_w):
     dx, dy = X / f - ref_w / 2, Y / f - (H / f) / 2
     u = dx * np.cos(th) + dy * np.sin(th)
     s = -dx * np.sin(th) + dy * np.cos(th)
-    cols, rows = u / ts + 2200, s / ts + TH / 2
+    cols, rows = u / ts + 2200, s / ts + TH / 2 + 330
     Hu, Hs, T, Hn = (samp(tex[n], rows, cols) for n in ("Hu", "Hs", "T", "Hn"))
     k = 5.0
     # derivadas em coordenadas do ecrã
@@ -449,7 +480,7 @@ def main():
         elif n == "medio":
             tex, face = get(3)
             W, H = sz(2000, 1400)
-            arr = scene_product("medio", tex, face, W, H, 2000, (1.25, 0.55, 4, 0.20, 0.4), 1.0, 1.0, 12)
+            arr = scene_product("medio", tex, face, W, H, 2000, (1.25, 0.55, 4, 0.20, 0.4), 1.0, 1.0, 12, dof_r=(1.6, 2.6))
             save(n, arr, 2000)
         elif n == "intenso":
             tex, face = get(4)
@@ -469,7 +500,7 @@ def main():
         elif n == "acabamento":
             tex, face = get(7)
             W, H = sz(1800, 1350)
-            arr = scene_product("suave", tex, face, W, H, 1800, (1.25, 0.9, -28, 0.55, 0.4), 1.2, 1.05, 15)
+            arr = scene_product("suave", tex, face, W, H, 1800, (1.25, 0.9, -28, 0.55, 0.4), 1.2, 1.05, 15, dof_r=(2.0, 3.2))
             save(n, arr, 1800)
         elif n == "fecho":
             tex, face = get(8)
