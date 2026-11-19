@@ -1,8 +1,9 @@
 import { useEffect } from "react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { site } from "./config/site.config";
 import { Header } from "./components/Header";
-import { Opening } from "./components/Opening";
-import { Statement } from "./components/Statement";
+import { Hero } from "./components/Hero";
+import { Leaf } from "./components/Leaf";
 import { Collection } from "./components/Collection";
 import { Craft } from "./components/Craft";
 import { Closing } from "./components/Closing";
@@ -11,9 +12,13 @@ import { useReveal } from "./components/useReveal";
 export default function App() {
   useReveal();
 
-  // O título do separador acompanha o nome configurado.
   useEffect(() => {
     document.title = `${site.brand.full} — ${site.hero.titleLines.join(" ")}`;
+    // Fontes e imagens mudam alturas: recalcula os pontos do scroll.
+    const refresh = () => ScrollTrigger.refresh();
+    window.addEventListener("load", refresh);
+    document.fonts?.ready.then(refresh);
+    return () => window.removeEventListener("load", refresh);
   }, []);
 
   return (
@@ -23,8 +28,8 @@ export default function App() {
       </a>
       <Header />
       <main>
-        <Opening />
-        <Statement />
+        <Hero />
+        <Leaf />
         <Collection />
         <Craft />
         <Closing />

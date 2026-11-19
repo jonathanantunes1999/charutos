@@ -3,13 +3,13 @@ import { useEffect, useRef } from "react";
 type P = { x: number; y: number; vx: number; vy: number; age: number; life: number; size: number; a: number; seed: number };
 
 /**
- * Fumo e poeira em canvas 2D. Meia resolução, pausa fora do ecrã/separador.
- * Não renderiza com prefers-reduced-motion.
+ * Fumo e poeira em canvas 2D (meia resolução; pausa fora do ecrã/separador).
+ * `getOrigin` devolve o ponto de emissão em frações do canvas.
  */
-export function Atmosphere({ origin }: { origin: { x: number; y: number } }) {
+export function Atmosphere({ getOrigin }: { getOrigin: () => { x: number; y: number } | null }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const org = useRef(origin);
-  org.current = origin;
+  const org = useRef(getOrigin);
+  org.current = getOrigin;
 
   useEffect(() => {
     const cv = ref.current;
@@ -31,16 +31,15 @@ export function Atmosphere({ origin }: { origin: { x: number; y: number } }) {
     let H = 0;
     const resize = () => {
       const r = cv.getBoundingClientRect();
-      const k = 0.5;
-      W = cv.width = Math.max(2, Math.round(r.width * k));
-      H = cv.height = Math.max(2, Math.round(r.height * k));
+      W = cv.width = Math.max(2, Math.round(r.width * 0.5));
+      H = cv.height = Math.max(2, Math.round(r.height * 0.5));
     };
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(cv);
 
     const smoke: P[] = [];
-    const dust = Array.from({ length: 38 }, () => ({
+    const dust = Array.from({ length: 34 }, () => ({
       x: Math.random(), y: Math.random(), r: 0.6 + Math.random() * 1.8, s: 0.004 + Math.random() * 0.012,
       ph: Math.random() * 6.28, a: 0.15 + Math.random() * 0.5,
     }));
@@ -62,12 +61,13 @@ export function Atmosphere({ origin }: { origin: { x: number; y: number } }) {
       last = now;
       if (!run || !visible) return;
       t += dt;
-      acc += dt * 70;
-      while (acc > 1) {
+      const o = org.current();
+      if (o) acc += dt * 70;
+      while (acc > 1 && o) {
         acc -= 1;
         smoke.push({
-          x: org.current.x * W + (Math.random() - 0.5) * W * 0.03,
-          y: org.current.y * H,
+          x: o.x * W + (Math.random() - 0.5) * W * 0.012,
+          y: o.y * H,
           vx: (Math.random() - 0.5) * 6,
           vy: -(26 + Math.random() * 26) * (H / 500),
           age: 0,
@@ -77,6 +77,7 @@ export function Atmosphere({ origin }: { origin: { x: number; y: number } }) {
           seed: Math.random() * 100,
         });
       }
+      acc = Math.min(acc, 3);
       ctx.clearRect(0, 0, W, H);
       ctx.globalCompositeOperation = "lighter";
       for (let i = smoke.length - 1; i >= 0; i--) {
@@ -87,14 +88,12 @@ export function Atmosphere({ origin }: { origin: { x: number; y: number } }) {
           continue;
         }
         const u = p.age / p.life;
-        // deriva em S: dois senos de frequências diferentes
         p.vx += (Math.sin(p.y * 0.022 + p.seed + t * 0.8) * 14 + Math.sin(p.y * 0.009 + t * 0.3) * 8 + 5) * dt;
         p.vx *= 0.985;
         p.x += p.vx * dt * (W / 700);
         p.y += p.vy * dt;
         const s = (p.size + u * 38) * (W / 700);
-        const alpha = p.a * Math.sin(Math.PI * u) ** 1.4;
-        ctx.globalAlpha = alpha;
+        ctx.globalAlpha = p.a * Math.sin(Math.PI * u) ** 1.4;
         ctx.drawImage(sprite, p.x - s / 2, p.y - s / 2, s, s);
       }
       ctx.globalAlpha = 1;

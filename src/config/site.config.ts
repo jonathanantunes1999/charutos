@@ -2,13 +2,13 @@
  * ─────────────────────────────────────────────────────────────
  *  CASA VÉU · ficheiro único de configuração
  * ─────────────────────────────────────────────────────────────
- *  Aqui mora tudo o que muda quando chegarem os materiais oficiais:
- *  nome, textos, produtos e caminhos das imagens.
+ *  Nome, textos, produtos e caminhos das imagens.
+ *  Imagens: ficheiros em /public/images (caminhos relativos a /public).
+ *  `srcSm` = versão leve (≈900–1200 px) para ecrãs pequenos.
  *
- *  Imagens: ficheiros em /public/images. Os caminhos são relativos a
- *  /public (sem barra inicial). Para trocar uma fotografia, substitui o
- *  ficheiro mantendo o nome, ou altera o caminho aqui.
- *  `srcSm` é a versão leve (≈900 px) usada em ecrãs pequenos.
+ *  Dois tipos de imagem:
+ *   · RECORTES (cut-*.webp): charuto inteiro com fundo transparente.
+ *   · FOTOGRAFIAS (folha, estrutura, …): macro com fundo.
  * ─────────────────────────────────────────────────────────────
  */
 
@@ -19,14 +19,15 @@ export type Product = {
   number: string;
   name: string;
   profile: "Suave" | "Médio" | "Intenso";
-  /** 1–3, alimenta o medidor de intensidade */
+  /** palavra gigante atrás do charuto */
+  word: string;
   intensity: 1 | 2 | 3;
   line: string;
-  /** cor ambiente da secção quando este charuto está selecionado */
-  accent: string;
   notes: string[];
   details: { label: string; value: string }[];
-  image: Img;
+  /** cores da secção quando este charuto está selecionado */
+  theme: { bg: string; glow: string };
+  cutout: Img;
 };
 
 export const site = {
@@ -45,46 +46,36 @@ export const site = {
   ],
 
   hero: {
+    eyebrow: "Charutos — conceito de coleção",
     titleLines: ["O detalhe", "revela-se", "devagar."],
-    /** palavra(s) da última linha a pôr em itálico */
-    lede: "Folha, ligação e capa, vistos de muito perto.",
     cta: { label: "Descobrir a coleção", href: "#colecao" },
     scrollCue: "Scroll",
-    /** ponto de onde sai o fumo (fração do ecrã) */
-    smoke: { desktop: { x: 0.77, y: 0.3 }, mobile: { x: 0.76, y: 0.28 } },
-    /** O mesmo charuto em duas luzes: sombra → luz aberta (usadas na transição por scroll). */
-    images: {
-      dark: {
-        src: "images/hero.webp",
-        srcSm: "images/hero-m.webp",
-        alt: "Charuto em macro, parcialmente na sombra, com a textura da capa a ganhar relevo sob luz lateral.",
-      },
-      lit: {
-        src: "images/hero-lit.webp",
-        srcSm: "images/hero-lit-m.webp",
-        alt: "O mesmo charuto sob luz aberta: veias, relevo e tom da folha de capa.",
-      },
-    },
+    cutout: {
+      src: "images/cut-hero.webp",
+      srcSm: "images/cut-hero-sm.webp",
+      alt: "Charuto de capa castanha, com veias finas e luz lateral, em diagonal sobre fundo escuro.",
+    } satisfies Img,
   },
 
-  reveal: {
-    beats: [
-      { kicker: "01 — Aproximar", text: "Chega mais perto." },
-      { kicker: "02 — A capa", text: "Cada veia é um caminho. Cada reflexo, uma pista." },
-      { kicker: "03 — A luz", text: "A folha só se mostra a quem lhe dá tempo." },
+  leaf: {
+    kicker: "01 — A folha",
+    lead: ["Chega mais", "perto."],
+    image: {
+      src: "images/folha.webp",
+      srcSm: "images/folha-sm.webp",
+      alt: "Macro de uma folha de tabaco sob luz rasante, com veias em relevo.",
+    } satisfies Img,
+    notes: [
+      { n: "01", t: "Veias", d: "Caminhos finos, em relevo." },
+      { n: "02", t: "Relevo", d: "A luz rasante conta o resto." },
+      { n: "03", t: "Tom", d: "Nunca uniforme. Sempre vivo." },
     ],
-  },
-
-  statement: {
-    text: "Um charuto não se despacha. Lê-se devagar, camada a camada, da capa ao coração.",
-    band: ["Folha", "Ligação", "Capa", "Tempo"],
   },
 
   collection: {
     id: "colecao",
     kicker: "02 — Coleção",
-    title: ["Três perfis.", "Uma só folha de atenção."],
-    intro: "Do mais leve ao mais denso. Escolhe um e vê o que cada um guarda.",
+    title: "Três perfis. Escolhe um.",
     disclaimer: "Perfis e notas ilustrativos, para apresentação do conceito.",
     intensityLabel: "Intensidade",
     products: [
@@ -93,9 +84,9 @@ export const site = {
         number: "01",
         name: "Véu Claro",
         profile: "Suave",
+        word: "SUAVE",
         intensity: 1,
         line: "Abre devagar, sem pressa e sem peso.",
-        accent: "#d9a85c",
         notes: ["Mel claro", "Cedro", "Amêndoa tostada"],
         details: [
           { label: "Capa", value: "Dourado claro, veia fina" },
@@ -103,10 +94,11 @@ export const site = {
           { label: "Formato", value: "Robusto" },
           { label: "Momento", value: "Fim de tarde" },
         ],
-        image: {
-          src: "images/suave.webp",
-          srcSm: "images/suave-sm.webp",
-          alt: "Charuto de capa dourada clara em macro, com veias finas e o pé do charuto à vista.",
+        theme: { bg: "#14241b", glow: "#3d7556" },
+        cutout: {
+          src: "images/cut-claro.webp",
+          srcSm: "images/cut-claro-sm.webp",
+          alt: "Charuto de capa dourada clara, inteiro, com a cabeça arredondada à esquerda.",
         },
       },
       {
@@ -114,9 +106,9 @@ export const site = {
         number: "02",
         name: "Véu Âmbar",
         profile: "Médio",
+        word: "MÉDIO",
         intensity: 2,
         line: "Equilíbrio entre doçura e carácter.",
-        accent: "#b8602c",
         notes: ["Cacau", "Couro", "Especiarias doces"],
         details: [
           { label: "Capa", value: "Castanho avermelhado" },
@@ -124,10 +116,11 @@ export const site = {
           { label: "Formato", value: "Toro" },
           { label: "Momento", value: "Depois de jantar" },
         ],
-        image: {
-          src: "images/medio.webp",
-          srcSm: "images/medio-sm.webp",
-          alt: "Charuto de capa castanha avermelhada em macro, com relevo e veias visíveis sob luz lateral.",
+        theme: { bg: "#7c2f14", glow: "#e0742f" },
+        cutout: {
+          src: "images/cut-ambar.webp",
+          srcSm: "images/cut-ambar-sm.webp",
+          alt: "Charuto de capa castanha avermelhada, inteiro, com veias visíveis.",
         },
       },
       {
@@ -135,9 +128,9 @@ export const site = {
         number: "03",
         name: "Véu Noite",
         profile: "Intenso",
+        word: "INTENSO",
         intensity: 3,
         line: "Escuro, denso e demorado.",
-        accent: "#8a3a22",
         notes: ["Café negro", "Madeira queimada", "Pimenta"],
         details: [
           { label: "Capa", value: "Quase negra, oleosa" },
@@ -145,10 +138,11 @@ export const site = {
           { label: "Formato", value: "Gordo" },
           { label: "Momento", value: "Noite longa" },
         ],
-        image: {
-          src: "images/intenso.webp",
-          srcSm: "images/intenso-sm.webp",
-          alt: "Charuto de capa quase negra em macro, com brilho discreto nas veias.",
+        theme: { bg: "#13070a", glow: "#7a2430" },
+        cutout: {
+          src: "images/cut-noite.webp",
+          srcSm: "images/cut-noite-sm.webp",
+          alt: "Charuto de capa quase negra, inteiro, com brilho discreto nas veias.",
         },
       },
     ] satisfies Product[],
@@ -157,7 +151,7 @@ export const site = {
   craft: {
     id: "oficio",
     kicker: "03 — O ofício",
-    title: ["Folha,", "construção,", "acabamento."],
+    title: "O ofício",
     intro: "Um charuto é feito de camadas. Cada uma tem um trabalho.",
     steps: [
       {
@@ -165,10 +159,11 @@ export const site = {
         title: "A folha",
         text: "A capa é a folha que se vê e se toca. Procura-se uma superfície elástica, de tom uniforme e veias finas. É a primeira leitura do charuto.",
         image: {
-          src: "images/folha.webp",
-          srcSm: "images/folha-sm.webp",
-          alt: "Detalhe de uma folha de tabaco sob luz rasante, com veias e relevo em evidência.",
-        },
+          src: "images/hero-lit.webp",
+          srcSm: "images/hero-lit-m.webp",
+          alt: "Charuto sob luz aberta, com a textura da capa em evidência.",
+        } satisfies Img,
+        focus: "46% 60%",
       },
       {
         number: "II",
@@ -178,7 +173,8 @@ export const site = {
           src: "images/estrutura.webp",
           srcSm: "images/estrutura-sm.webp",
           alt: "Macro do pé de um charuto, onde se distinguem o enchimento, a ligação e a capa.",
-        },
+        } satisfies Img,
+        focus: "0% 50%",
       },
       {
         number: "III",
@@ -187,8 +183,9 @@ export const site = {
         image: {
           src: "images/acabamento.webp",
           srcSm: "images/acabamento-sm.webp",
-          alt: "Macro da costura em espiral da capa de um charuto.",
-        },
+          alt: "Macro da capa de um charuto em espiral, com veias e luz rasante.",
+        } satisfies Img,
+        focus: "70% 70%",
       },
     ],
     note: "Descrição geral do ofício. Os processos próprios da marca entram quando houver materiais oficiais.",
@@ -198,8 +195,8 @@ export const site = {
     image: {
       src: "images/fecho.webp",
       srcSm: "images/fecho-sm.webp",
-      alt: "Charuto pousado numa superfície escura, com reflexo suave e luz lateral.",
-    },
+      alt: "Charuto pousado numa superfície escura, com reflexo suave.",
+    } satisfies Img,
     line: "O detalhe revela-se devagar.",
     toTop: { label: "Voltar ao topo", href: "#topo" },
   },

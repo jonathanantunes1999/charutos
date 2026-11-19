@@ -1,30 +1,24 @@
 import { site } from "../config/site.config";
 import { Picture } from "./Picture";
-import { Wordmark } from "./Wordmark";
+import { Badge } from "./Badge";
 
 export function Closing() {
   const { closing: c, footer } = site;
   return (
     <>
-      <section className="closing" aria-label="Fecho">
-        <div className="closing__bg">
+      <section className="end" aria-label="Fecho">
+        <div className="end__bg">
           <Picture img={c.image} smallBelow={900} />
         </div>
-        <div className="closing__shade" aria-hidden="true" />
-        <div className="closing__body" data-reveal>
-          <p className="closing__line">{c.line}</p>
-          <div className="closing__mark">
-            <Wordmark className="wordmark--xl" />
-          </div>
-          <a className="totop" href={c.toTop.href}>
-            <span className="totop__arrow" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.4">
-                <path d="M12 20V5M6 11l6-6 6 6" />
-              </svg>
-            </span>
-            <span className="totop__label">{c.toTop.label}</span>
-          </a>
+        <div className="end__shade" aria-hidden="true" />
+        <div className="end__giant" aria-hidden="true" data-reveal>
+          <small>{site.brand.first}</small>
+          <span>{site.brand.second}</span>
         </div>
+        <p className="end__line" data-reveal>
+          {c.line}
+        </p>
+        <Badge href={c.toTop.href} label={c.toTop.label} up className="badge--end" />
       </section>
       <footer className="footer">
         <p className="footer__concept">{footer.concept}</p>

@@ -158,7 +158,7 @@ def norm(v):
 
 
 def render_cigar(W, H, f, tex, face, cx, cy, A_deg, R, pal, light, ts=1.0, q=0.42, k=2.6,
-                 face_pal=None, show_face=True, spec=0.22):
+                 face_pal=None, show_face=True, spec=0.22, L=None):
     """Devolve (rgb linear, alpha do corpo+face, dist. ao foco p/ DOF). Coordenadas em px 'ref' (f=escala)."""
     A = np.deg2rad(A_deg)
     ca, sa = np.cos(A), np.sin(A)
@@ -166,15 +166,26 @@ def render_cigar(W, H, f, tex, face, cx, cy, A_deg, R, pal, light, ts=1.0, q=0.4
     dx, dy = X / f - cx, Y / f - cy
     xl = dx * ca + dy * sa
     yl = -dx * sa + dy * ca
-    Rx = R * (1 + 0.02 * np.sin(xl / 520 + 1.0) + 0.012 * np.sin(xl / 170))
-    v = np.clip(yl / Rx, -0.995, 0.995)
+    def Rfun(x):
+        r = R * (1 + 0.02 * np.sin(x / 520 + 1.0) + 0.012 * np.sin(x / 170))
+        if L is not None:
+            u = -x
+            r = r * (1 - 0.03 * smoothstep(0.5 * L, L, u))
+            capL = 1.05 * R
+            t = np.clip((u - (L - capL)) / capL, 0, 1)
+            r = r * (1 - t**2.3 + 1e-6) ** (1 / 2.3)
+        return r
+
+    Rx = Rfun(xl)
+    dRx = np.clip((Rfun(xl + 1.0) - Rfun(xl - 1.0)) / 2, -6, 6) if L is not None else 0.0
+    v = np.clip(yl / np.maximum(Rx, 1e-3), -0.995, 0.995)
     sq = np.sqrt(1 - v * v)
     rows = R * np.arcsin(v) / ts + TH / 2
     cols = (-xl) / ts + 300
     Hu, Hs, T, Hn = (samp(tex[n], rows, cols) for n in ("Hu", "Hs", "T", "Hn"))
     Hxl = -Hu / ts
     Hsl = Hs / ts
-    Nx = -k * Hxl
+    Nx = -k * Hxl - dRx
     Ny = v - k * Hsl * sq
     Nz = sq + k * Hsl * v
     nn = np.sqrt(Nx**2 + Ny**2 + Nz**2)
@@ -185,8 +196,12 @@ def render_cigar(W, H, f, tex, face, cx, cy, A_deg, R, pal, light, ts=1.0, q=0.4
         return np.array([L[0] * ca + L[1] * sa, -L[0] * sa + L[1] * ca, L[2]], np.float32)
 
     Lk, Lr = to_local(light["key"]), to_local(light["rim"])
-    albedo = ramp(T, pal)
     ao = 0.5 + 0.5 * Hn
+    if L is not None:
+        uu = -xl
+        T = T - 0.09 * smoothstep(L - 1.4 * R, L - 0.95 * R, uu)
+        ao = ao * (1 - 0.4 * np.exp(-(((uu - (L - 1.1 * R)) / 5.0) ** 2)))
+    albedo = ramp(T, pal)
     d1 = np.clip((Nx * Lk[0] + Ny * Lk[1] + Nz * Lk[2] + 0.12) / 1.12, 0, 1)
     d2 = np.clip(Nx * Lr[0] + Ny * Lr[1] + Nz * Lr[2], 0, 1)
     Hv = norm(Lk + np.array([0, 0, 1], np.float32))
@@ -195,9 +210,15 @@ def render_cigar(W, H, f, tex, face, cx, cy, A_deg, R, pal, light, ts=1.0, q=0.4
     kc = np.array(light["key_col"], np.float32) * light["key_i"]
     rc = np.array(light["rim_col"], np.float32) * light["rim_i"]
     body = albedo * (light["amb"] + d1[..., None] * kc + d2[..., None] * rc) * ao[..., None]
+    if "bounce" in light:
+        Lb = to_local(light["bounce"])
+        d3 = np.clip(Nx * Lb[0] + Ny * Lb[1] + Nz * Lb[2], 0, 1)
+        body += albedo * d3[..., None] * np.array(light["bounce_col"], np.float32) * light["bounce_i"] * ao[..., None]
     body += sp[..., None] * kc * (0.35 + 0.65 * Hn[..., None] ** 0.5)
 
     a_body = np.clip((Rx - np.abs(yl)) * f / 1.2 + 0.5, 0, 1) * np.clip(-xl * f / 1.2 + 0.5, 0, 1)
+    if L is not None:
+        a_body = a_body * np.clip((xl + L) * f / 1.2 + 0.5, 0, 1)
     img = body * a_body[..., None]
     alpha = a_body.copy()
 
@@ -437,7 +458,29 @@ def scene_closing(tex, face, W, H, ref_w):
     return finish(out, f, exposure=1.0, vignette=0.55, vg_center=(0.65, 0.65), shadow_grad=sg, seed=32)
 
 
-JOBS = ["hero", "hero-lit", "hero-m", "hero-lit-m", "suave", "medio", "intenso",
+def scene_cutout(tex, face, pal_name, light, scale=1.0, exposure=1.0, q=0.5, spec=0.22, R=190, L=2240):
+    ref_w, ref_h = int(L + 40 + q * R + 44), int(2 * R + 70)
+    W, H = int(ref_w * scale), int(ref_h * scale)
+    img, alpha, _ = render_cigar(W, H, scale, tex, face, L + 40, ref_h / 2, 0, R, PAL[pal_name], light,
+                                 q=q, face_pal=FACE[pal_name], spec=spec, L=L, k=1.7)
+    a = np.clip(alpha, 0, 1)[..., None]
+    col = img / np.maximum(a, 1e-3)
+    lum = col.max(-1, keepdims=True)
+    hi = np.clip(col - 0.9, 0, None)
+    x = (col + 0.1 * np.stack([gaussian_filter(hi[..., i], 10 * scale) for i in range(3)], -1)) * exposure
+    x = (x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14)
+    x = srgb(x)
+    rng = np.random.default_rng(7)
+    x = x + gaussian_filter(rng.standard_normal((H, W)).astype(np.float32), 0.7)[..., None] * 0.012
+    rgb = (np.clip(x, 0, 1) * 255).astype(np.uint8)
+    return np.dstack([rgb, (a[..., 0] * 255).astype(np.uint8)])
+
+
+LIGHT_CUT = dict(key=(0.5, -0.68, 0.56), key_col=(1.0, 0.88, 0.72), key_i=2.2,
+                 rim=(-0.9, -0.2, 0.25), rim_col=(0.95, 0.55, 0.32), rim_i=0.7, amb=0.07,
+                 bounce=(0.0, 0.9, 0.35), bounce_col=(0.7, 0.45, 0.26), bounce_i=0.35)
+
+JOBS = ["cut-hero", "cut-claro", "cut-ambar", "cut-noite", "hero", "hero-lit", "hero-m", "hero-lit-m", "suave", "medio", "intenso",
         "folha", "estrutura", "acabamento", "fecho"]
 
 
@@ -467,6 +510,19 @@ def main():
             W, H = sz(2800, 1575)
             arr = scene_hero(tex, face, W, H, 2800, n == "hero-lit", False)
             save(n, arr, 2560, 76)
+        elif n.startswith("cut-"):
+            seed, pal = {"cut-hero": (1, "hero"), "cut-claro": (2, "suave"), "cut-ambar": (3, "medio"), "cut-noite": (4, "intenso")}[n]
+            tex, face = get(seed)
+            light = dict(LIGHT_CUT)
+            if pal == "intenso":
+                light["key_i"] = 3.2
+            arr = scene_cutout(tex, face, pal, light, scale=sc, exposure=1.0, spec=0.06 if pal == "intenso" else 0.12)
+            im = Image.fromarray(arr, "RGBA")
+            os.makedirs(OUT, exist_ok=True)
+            im.save(os.path.join(OUT, n + ".webp"), quality=90, alpha_quality=100, method=6)
+            im.resize((1200, round(1200 * im.height / im.width)), Image.LANCZOS).save(
+                os.path.join(OUT, n + "-sm.webp"), quality=86, alpha_quality=100, method=6)
+            print("  ->", n, im.size)
         elif n in ("hero-m", "hero-lit-m"):
             tex, face = get(1)
             W, H = sz(1260, 2240)

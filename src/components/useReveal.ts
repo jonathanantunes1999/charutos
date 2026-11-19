@@ -1,10 +1,6 @@
 import { useEffect } from "react";
 
-/**
- * Entrada discreta dos blocos marcados com [data-reveal].
- * Só esconde os elementos depois de o JS arrancar e se o utilizador
- * não pediu menos movimento; caso contrário, tudo fica visível.
- */
+/** Entrada discreta dos blocos [data-reveal]; só esconde se houver JS e movimento permitido. */
 export function useReveal() {
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -20,7 +16,7 @@ export function useReveal() {
           }
         }
       },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.05 },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.05 },
     );
     document.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));
     return () => {

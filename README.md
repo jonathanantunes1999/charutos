@@ -6,54 +6,42 @@ Proposta visual para uma marca de charutos. **CASA VÉU** é um nome de trabalho
 
 ```bash
 npm install
-npm run dev        # desenvolvimento → http://localhost:5173
-npm run build      # build de produção em dist/
-npm run build:pages # build para docs/ (GitHub Pages: Branch → /docs)
-npm run preview    # servir a build → http://localhost:4173
+npm run dev          # desenvolvimento → http://localhost:5173
+npm run build        # build de produção em dist/
+npm run preview      # servir a build → http://localhost:4173
+npm run build:pages  # build para docs/ (GitHub Pages: Branch → /docs)
 ```
 
-A build usa caminhos relativos (`base: "./"`): `dist/` pode ir para qualquer pasta ou domínio.
+A build usa caminhos relativos (`base: "./"`): funciona em qualquer pasta ou domínio.
+
+## Estrutura da página
+
+1. **Hero** — palavra gigante atrás, charuto recortado a cruzar o ecrã (parallax com o rato), fumo e poeira, botão circular com texto a rodar.
+2. **A folha** — um círculo abre-se e revela o macro da folha (palco `sticky`, scroll nativo).
+3. **Coleção** — três blocos de cor (verde, terracota, vinho); cada charuto muda cor, palavra gigante, charuto e painel. Teclado (setas, Home, End) e toque.
+4. **O ofício** — papel marfim; em desktop, pista horizontal fixada ao scroll; em mobile, coluna.
+5. **Fecho** — wordmark gigante, imagem e "voltar ao topo".
 
 ## Trocar nome, textos, produtos e imagens
 
-Tudo está em **`src/config/site.config.ts`**:
+Tudo está em **`src/config/site.config.ts`**: nome (`brand`), textos, produtos (nome, perfil, notas, detalhes, **cores do bloco**) e caminhos das imagens.
+Logótipo real: substituir `src/components/Wordmark.tsx` por um `<svg>`.
 
-| O quê | Onde no ficheiro |
-| --- | --- |
-| Nome / wordmark | `brand.first` e `brand.second` (o título da página acompanha) |
-| Logótipo real | substituir `src/components/Wordmark.tsx` por um `<svg>` |
-| Título, subtítulo e CTA do hero | `hero` |
-| Frases da transição por scroll | `reveal.beats` |
-| Três charutos (nome, perfil, notas, detalhes, foto) | `collection.products` |
-| Secção O ofício | `craft` |
-| Fecho e rodapé | `closing`, `footer` |
+### Imagens (`public/images/`)
 
-As imagens ficam em `public/images/`. Troca o ficheiro mantendo o nome, ou muda o caminho no config.
-Cada imagem tem `src` (grande) e `srcSm` (≈900 px, para telemóvel).
+**Não são fotografias**: são renders procedurais (`scripts/generate_images.py`), sem direitos de terceiros. São placeholders.
 
-## Imagens — estado atual
-
-**Não são fotografias.** Foram geradas proceduralmente por `scripts/generate_images.py`
-(folha de tabaco, veias, luz lateral, profundidade de campo, grão) para validar direção de arte e
-composição. Não há fontes externas nem direitos de terceiros. São placeholders: devem ser substituídos
-por fotografia real (ou geração por IA) com a mesma intenção de enquadramento.
-
-| Ficheiro | Formato | Papel |
+| Tipo | Ficheiros | Notas |
 | --- | --- | --- |
-| `hero.webp` / `hero-m.webp` | 16:9 / 9:16 | Hero, charuto em macro na sombra |
-| `hero-lit.webp` / `hero-lit-m.webp` | idem | **Mesmo enquadramento**, luz aberta (revelação por scroll) |
-| `suave.webp`, `medio.webp`, `intenso.webp` (+ `-sm`) | 4:5 / 10:7 / 4:5 | Os três charutos |
-| `folha.webp`, `estrutura.webp`, `acabamento.webp` (+ `-sm`) | 4:5 / 4:3 / 4:3 | O ofício |
-| `fecho.webp` (+ `-sm`) | 2:1 | Fecho |
+| **Recortes** (PNG/WebP com transparência) | `cut-hero`, `cut-claro`, `cut-ambar`, `cut-noite` (+ `-sm`) | Charuto **inteiro**, na horizontal, **cabeça à esquerda e pé à direita**, fundo transparente, ≈ 2400×450. Quanto mais o recorte for limpo, melhor. |
+| **Macro** | `folha`, `hero-lit`, `estrutura`, `acabamento`, `fecho` (+ `-sm`) | Fotografias com fundo. `focus` em `craft.steps` escolhe o ponto de corte. |
 
-Dica: o par `hero` / `hero-lit` tem de ter exatamente o mesmo enquadramento (o crossfade depende disso).
-O ponto de aproximação está em `src/components/Opening.tsx` (`origin`, `scale`).
+Com fotografias reais, o ideal é fotografar cada charuto isolado em fundo liso (ou recortar) e exportar WebP com transparência.
 
-Regenerar os placeholders: `pip install numpy scipy pillow && python3 scripts/generate_images.py [nome …]`.
+Regenerar placeholders: `pip install numpy scipy pillow && python3 scripts/generate_images.py [nome …]`.
 
 ## Notas
 
-- Respeita `prefers-reduced-motion`: sem pin/zoom; a imagem iluminada e as frases aparecem como bloco estático.
-- O scroll é sempre o nativo (palco `position: sticky`, GSAP ScrollTrigger só lê o progresso).
-- Mobile tem layout próprio e transição mais curta (235svh em vez de 330svh).
+- `prefers-reduced-motion`: sem pin/zoom/iris/fumo; as frases e imagens aparecem como blocos estáticos e a pista do ofício passa a coluna.
+- O scroll é sempre o nativo (`sticky`/pin do ScrollTrigger; nunca se sequestra o scroll).
 - Publicidade a tabaco é muito restrita em Portugal/UE: validar legalmente antes de publicar.
