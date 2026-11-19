@@ -30,8 +30,8 @@ export function Atmosphere({ getOrigin }: { getOrigin: () => Origin }) {
 function watch(cv: HTMLCanvasElement, onResize: (w: number, h: number) => void) {
   const resize = () => {
     const r = cv.getBoundingClientRect();
-    const w = Math.max(2, Math.round(r.width * 0.5));
-    const h = Math.max(2, Math.round(r.height * 0.5));
+    const w = Math.max(2, Math.round(r.width * 0.75));
+    const h = Math.max(2, Math.round(r.height * 0.75));
     cv.width = w;
     cv.height = h;
     onResize(w, h);
@@ -94,49 +94,40 @@ float dust(vec2 uv, float t){
 }
 
 void main(){
-  vec2 org = u_org;
-  float H = max(u_res.y - org.y, 40.0);            // espaço disponível acima da origem
-  vec2 d = (gl_FragCoord.xy - org) / H;            // h=1 → topo do ecrã (a pluma adapta-se)
-  vec2 dpx = (gl_FragCoord.xy - org) / u_res.y;
+  float H = max(u_res.y - u_org.y, 40.0);          // espaço disponível acima da origem
+  vec2 d = (gl_FragCoord.xy - u_org) / H;          // h=1 → topo do ecrã (a pluma adapta-se)
   float h = d.y;
   float t = u_t;
 
   float dens = 0.0;
   if (h > 0.0){
-    // linha central: oscila e inclina com a altura (vento)
-    float xc = sin(h*6.0 - t*0.8)*0.012*h + 0.05*h*h + sin(t*0.27)*0.03*h;
-    // distorção de domínio crescente com a altura: laminar em baixo, turbulento em cima
-    vec2 q = vec2(fbm(vec2(d.x*5.0, h*3.2 - t*0.32)),
-                  fbm(vec2(d.x*5.0 + 5.2, h*3.2 - t*0.32 + 1.3)));
-    float warp = 0.004 + 0.46*h*h;
-    float x = d.x - xc + (q.x - 0.5)*warp*2.0;
-    float w = 0.0045 + 0.115*pow(h, 1.1);
+    // desvio lento da coluna (vento + ondulação)
+    float xc = 0.05*h*h + sin(h*4.2 - t*0.55)*0.03*h + sin(t*0.21)*0.035*h;
+    // dupla distorção de domínio: dá volutas em vez de linhas
+    vec2 p = vec2(d.x*2.6, h*1.9);
+    vec2 adv = vec2(0.0, -t*0.2);
+    vec2 q = vec2(fbm(p + adv), fbm(p + adv + vec2(5.2, 1.3)));
+    vec2 r = vec2(fbm(p + 3.2*q + adv*0.8 + vec2(1.7, 9.2)), fbm(p + 3.2*q + adv*0.8 + vec2(8.3, 2.8)));
+    float warp = 0.02 + 0.55*pow(h, 1.25);
+    float x = d.x - xc + (r.x - 0.5)*warp*1.6;
+    // coluna larga e macia que se abre com a altura
+    float w = 0.012 + 0.15*h;
     float core = exp(-(x*x)/(w*w));
-    // filamentos finos (ruído "ridged") dentro da coluna
-    float n = fbm(vec2(x*(22.0/(0.35 + h)), h*6.5 - t*0.55 + q.y*2.4));
-    float r = pow(1.0 - abs(2.0*n - 1.0), 3.0);
-    // pulsos (baforadas) ao longo da altura
-    float puff = 0.62 + 0.38*sin(h*8.0 - t*1.35 + q.x*5.0);
-    dens = core * (0.28 + 1.0*r) * puff;
-    dens *= smoothstep(0.0, 0.02, h) * (1.0 - smoothstep(0.45, 1.0, h));
-    dens *= 1.0/(1.0 + 1.2*h);
+    // textura de fumo: bordas esfiapadas, não linhas
+    float tex = fbm(vec2(x*9.0, h*4.2 - t*0.42) + r*2.2);
+    float wisp = smoothstep(0.30, 0.78, tex + 0.35*core);
+    dens = core * wisp;
+    dens *= smoothstep(0.0, 0.09, h) * (1.0 - smoothstep(0.38, 1.0, h));
+    dens *= 1.0/(1.0 + 0.9*h);
   }
-  // cor: quente junto à brasa, azulada mais acima
-  vec3 smokeCol = mix(vec3(1.0, 0.9, 0.78), vec3(0.64, 0.72, 0.84), clamp(h*1.5, 0.0, 1.0));
-  float a = clamp(dens*1.25, 0.0, 0.9);
+  vec3 smokeCol = mix(vec3(0.86, 0.80, 0.74), vec3(0.62, 0.68, 0.76), clamp(h*1.4, 0.0, 1.0));
+  float a = clamp(dens*0.5, 0.0, 0.5);
 
   // pó em suspensão (ligeiro, quente)
   vec2 uv = gl_FragCoord.xy / u_res.y;
   float ds = dust(uv, t);
   vec3 col = smokeCol*a + vec3(1.0, 0.82, 0.6)*ds*0.5;
-  float alpha = max(a, ds*0.5);
-
-  // brilho muito discreto no ponto de emissão
-  float g = exp(-pow(length(dpx*vec2(1.0, 1.4))/0.03, 2.0)) * (0.16 + 0.05*sin(t*2.3));
-  col += vec3(1.0, 0.5, 0.2)*g;
-  alpha = max(alpha, g);
-
-  gl_FragColor = vec4(col, alpha);
+  gl_FragColor = vec4(col, max(a, ds*0.5));
 }`;
 
 function startGL(cv: HTMLCanvasElement, gl: WebGLRenderingContext, getOrigin: () => Origin) {
