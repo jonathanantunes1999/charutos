@@ -3,7 +3,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { site } from "./config/site.config";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
-import { Leaf } from "./components/Leaf";
 import { Collection } from "./components/Collection";
 import { Craft } from "./components/Craft";
 import { Closing } from "./components/Closing";
@@ -29,7 +28,6 @@ export default function App() {
       <Header />
       <main>
         <Hero />
-        <Leaf />
         <Collection />
         <Craft />
         <Closing />

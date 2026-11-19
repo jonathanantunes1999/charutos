@@ -198,7 +198,6 @@ def main():
         save_rgba(np.dstack([v, a]), n, 2400)
     print("a gerar macros …")
     # 4:5 e 16:10 a partir da foto sem anilha (alta resolução)
-    crop_save(clean, (1750, 1735, 928, 580), (2000, 1250), "folha")             # íris (paisagem)
     crop_save(clean, (2880, 1730, 464, 580), (1000, 1250), "hero-lit")           # ofício I  (fissura da folha)
     crop_save(clean, (880, 1730, 464, 580), (1000, 1250), "estrutura")           # ofício II (extremo cortado)
     crop_save(clean, (4830, 1710, 464, 580), (1000, 1250), "acabamento")         # ofício III (ponta)
@@ -206,10 +205,6 @@ def main():
     # a versão "-m" do hero-lit só existe por compatibilidade com o config antigo
     import shutil
     shutil.copy(os.path.join(OUT, "hero-lit.webp"), os.path.join(OUT, "hero-lit-m.webp"))
-    # versão vertical da folha para telemóvel (corte mais fechado)
-    crop_save(clean, (2150, 1735, 464, 580), (900, 1125), "folha-m", q=80)
-    os.replace(os.path.join(OUT, "folha-m.webp"), os.path.join(OUT, "folha-sm.webp"))
-    os.remove(os.path.join(OUT, "folha-m-sm.webp"))
 
 
 if __name__ == "__main__":

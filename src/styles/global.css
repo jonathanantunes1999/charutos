@@ -315,99 +315,6 @@ em {
   color: #ecc8a0;
 }
 
-/* ─────────────── LEAF (iris) ─────────────── */
-.leaf {
-  position: relative;
-  height: 300svh;
-  background: var(--ink);
-}
-.leaf__stick {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  overflow: hidden;
-}
-.leaf__intro {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 18px;
-  text-align: center;
-  padding: 0 var(--gutter);
-}
-.leaf__lead {
-  font-family: var(--serif);
-  font-weight: 300;
-  font-variation-settings: "opsz" 144;
-  font-size: clamp(3.4rem, 13vw, 14rem);
-  line-height: 0.9;
-  letter-spacing: -0.045em;
-}
-.leaf__lead span,
-.leaf__lead em {
-  display: block;
-}
-.leaf__lead em {
-  color: #ecc8a0;
-}
-.leaf__iris {
-  position: absolute;
-  inset: 0;
-  clip-path: circle(0px at 50% 50%);
-  background: var(--ink);
-  will-change: clip-path;
-}
-.leaf__img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  will-change: transform;
-}
-.leaf__shade {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(0deg, rgba(10, 8, 7, 0.85) 0%, rgba(10, 8, 7, 0.2) 45%, transparent 70%),
-    radial-gradient(80% 70% at 50% 45%, transparent 40%, rgba(10, 8, 7, 0.55) 100%);
-}
-.leaf__ring {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 0;
-  height: 0;
-  transform: translate(-50%, -50%);
-  border: 1px solid rgba(194, 106, 54, 0.8);
-  border-radius: 50%;
-  pointer-events: none;
-}
-.leaf__note {
-  position: absolute;
-  display: grid;
-  gap: 6px;
-  max-width: 24ch;
-  opacity: 0;
-  visibility: hidden;
-}
-.leaf__note strong {
-  font-family: var(--serif);
-  font-weight: 300;
-  font-variation-settings: "opsz" 144;
-  font-size: clamp(2.2rem, 4.6vw, 4.6rem);
-  line-height: 1;
-  letter-spacing: -0.03em;
-}
-.leaf__d {
-  color: var(--ivory-2);
-  font-size: 0.98rem;
-}
-.leaf__note--1 { left: var(--gutter); bottom: 13svh; }
-.leaf__note--2 { right: var(--gutter); top: 24svh; text-align: right; justify-items: end; }
-.leaf__note--3 { left: 42%; bottom: 9svh; }
 
 /* ─────────────── COLEÇÃO ─────────────── */
 .coll {
@@ -986,20 +893,6 @@ em {
   .hero__title {
     font-size: clamp(2.7rem, 13.6vw, 4.6rem);
   }
-  .leaf {
-    height: 230svh;
-  }
-  .leaf__note--1,
-  .leaf__note--2,
-  .leaf__note--3 {
-    left: var(--gutter);
-    right: var(--gutter);
-    top: auto;
-    bottom: 9svh;
-    text-align: left;
-    justify-items: start;
-    max-width: none;
-  }
   .details {
     gap: 0 14px;
   }
@@ -1023,36 +916,6 @@ em {
     transition-duration: 0.01ms !important;
   }
   .hero__giant .g-l { overflow: visible; }
-  .leaf { height: auto; }
-  .leaf__stick {
-    position: relative;
-    height: auto;
-    overflow: visible;
-  }
-  .leaf__intro {
-    position: relative;
-    padding: 18svh var(--gutter) 6svh;
-  }
-  .leaf__iris {
-    position: relative;
-    height: 80svh;
-    clip-path: none !important;
-  }
-  .leaf__ring { display: none; }
-  .leaf__notes {
-    position: absolute;
-    inset: auto var(--gutter) 6svh;
-    display: grid;
-    gap: 18px;
-  }
-  .leaf__note {
-    position: static !important;
-    opacity: 1;
-    visibility: visible;
-    text-align: left !important;
-    justify-items: start !important;
-  }
-  .leaf__note strong { font-size: 2rem; }
   .coll__cigar-in { animation: none; }
 }
 

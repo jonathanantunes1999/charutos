@@ -8,7 +8,7 @@
  *
  *  Dois tipos de imagem:
  *   · RECORTES (cut-*.webp): charuto inteiro com fundo transparente.
- *   · FOTOGRAFIAS (folha, estrutura, …): macro com fundo.
+ *   · FOTOGRAFIAS (hero-lit, estrutura, …): macro com fundo.
  * ─────────────────────────────────────────────────────────────
  */
 
@@ -52,20 +52,6 @@ export const site = {
       srcSm: "images/cut-hero-sm.webp",
       alt: "Charuto torpedo de capa escura e castanha, com textura de folha visível, em diagonal sobre fundo escuro.",
     } satisfies Img,
-  },
-
-  leaf: {
-    lead: ["Chega mais", "perto."],
-    image: {
-      src: "images/folha.webp",
-      srcSm: "images/folha-sm.webp",
-      alt: "Macro da capa de um charuto, a passar do castanho escuro ao cobre, com a textura da folha.",
-    } satisfies Img,
-    notes: [
-      { t: "Veias", d: "Caminhos finos, em relevo." },
-      { t: "Relevo", d: "A luz rasante conta o resto." },
-      { t: "Tom", d: "Nunca uniforme. Sempre vivo." },
-    ],
   },
 
   collection: {

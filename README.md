@@ -17,10 +17,9 @@ A build usa caminhos relativos (`base: "./"`): funciona em qualquer pasta ou dom
 ## Estrutura da página
 
 1. **Hero** — palavra gigante atrás, charuto recortado a cruzar o ecrã (parallax com o rato), fumo e poeira, botão circular com texto a rodar.
-2. **A folha** — um círculo abre-se e revela o macro da folha (palco `sticky`, scroll nativo).
-3. **Coleção** — três blocos de cor (verde, terracota, vinho); cada charuto muda cor, palavra gigante, charuto e painel. Teclado (setas, Home, End) e toque.
-4. **O ofício** — papel marfim; em desktop, pista horizontal fixada ao scroll; em mobile, coluna.
-5. **Fecho** — wordmark gigante, imagem e "voltar ao topo".
+2. **Coleção** — três blocos de cor (verde, terracota, vinho); cada charuto muda cor, palavra gigante, charuto e painel. Teclado (setas, Home, End) e toque.
+3. **O ofício** — papel marfim; em desktop, pista horizontal fixada ao scroll; em mobile, coluna.
+4. **Fecho** — wordmark gigante, imagem e "voltar ao topo".
 
 ## Trocar nome, textos, produtos e imagens
 
@@ -34,18 +33,18 @@ Vêm todas de **uma única fotografia** (`assets/source/cigar-unsplash.jpg`, de 
 1. a **anilha** da marca é removida (reconstrução da capa com a textura do próprio charuto);
 2. o charuto é **recortado** com fundo transparente (cabeça à esquerda, pé à direita);
 3. os três perfis (`cut-claro`, `cut-ambar`, `cut-noite`) são **o mesmo charuto com correção de cor**, só para validar o conceito; `cut-hero` é o original;
-4. os macros (`folha`, `hero-lit`, `estrutura`, `acabamento`) e o fecho (`fecho`) são recortes da fotografia.
+4. os macros (`hero-lit`, `estrutura`, `acabamento`) e o fecho (`fecho`) são recortes da fotografia.
 
 | Tipo | Ficheiros | Notas |
 | --- | --- | --- |
 | **Recortes** (WebP com transparência) | `cut-hero`, `cut-claro`, `cut-ambar`, `cut-noite` (+ `-sm`) | Charuto **inteiro**, na horizontal, **ponta à esquerda e extremo plano à direita**, fundo transparente. |
-| **Macro / fotografia** | `folha` (+ `folha-sm` vertical), `hero-lit`, `estrutura`, `acabamento`, `fecho` | `focus` em `craft.steps` escolhe o ponto de corte. |
+| **Macro / fotografia** | `hero-lit`, `estrutura`, `acabamento`, `fecho` | `focus` em `craft.steps` escolhe o ponto de corte. |
 
 Quando houver fotografias oficiais de cada charuto, basta substituir os ficheiros mantendo os nomes (ou alterar os caminhos no config).
 Reprocessar: `pip install numpy pillow opencv-python-headless && python3 scripts/process_photo.py [outra-foto.jpg]` (os pontos de reparação e recorte estão ajustados a esta fotografia).
 
 ## Notas
 
-- `prefers-reduced-motion`: sem pin/zoom/iris/fumo; as frases e imagens aparecem como blocos estáticos e a pista do ofício passa a coluna.
+- `prefers-reduced-motion`: sem pin/zoom; as frases e imagens aparecem como blocos estáticos e a pista do ofício passa a coluna.
 - O scroll é sempre o nativo (`sticky`/pin do ScrollTrigger; nunca se sequestra o scroll).
 - Publicidade a tabaco é muito restrita em Portugal/UE: validar legalmente antes de publicar.
