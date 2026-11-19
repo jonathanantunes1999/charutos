@@ -8,6 +8,7 @@ Proposta visual para uma marca de charutos. **CASA VÉU** é um nome de trabalho
 npm install
 npm run dev        # desenvolvimento → http://localhost:5173
 npm run build      # build de produção em dist/
+npm run build:pages # build para docs/ (GitHub Pages: Branch → /docs)
 npm run preview    # servir a build → http://localhost:4173
 ```
 
