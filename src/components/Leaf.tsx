@@ -54,7 +54,6 @@ export function Leaf() {
     <section className="leaf" ref={root} aria-labelledby="leaf-t">
       <div className="leaf__stick">
         <div className="leaf__intro">
-          <p className="kicker">{leaf.kicker}</p>
           <h2 id="leaf-t" className="leaf__lead">
             <span>{leaf.lead[0]}</span>
             <em>{leaf.lead[1]}</em>
@@ -66,8 +65,7 @@ export function Leaf() {
           <div className="leaf__shade" aria-hidden="true" />
           <ul className="leaf__notes">
             {leaf.notes.map((n, i) => (
-              <li className={`leaf__note leaf__note--${i + 1}`} key={n.n}>
-                <span className="leaf__n">{n.n}</span>
+              <li className={`leaf__note leaf__note--${i + 1}`} key={n.t}>
                 <strong>{n.t}</strong>
                 <span className="leaf__d">{n.d}</span>
               </li>

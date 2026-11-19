@@ -32,7 +32,6 @@ export function Collection() {
       style={{ ["--bg" as string]: p.theme.bg, ["--glow" as string]: p.theme.glow } as CSSProperties}
     >
       <header className="coll__head" data-reveal>
-        <p className="kicker">{c.kicker}</p>
         <h2 id="colecao-titulo" className="coll__title">
           {c.title}
         </h2>
@@ -54,9 +53,6 @@ export function Collection() {
             </div>
             <div className="coll__shadow" aria-hidden="true" />
           </div>
-          <span className="coll__num" aria-hidden="true">
-            {p.number}
-          </span>
         </div>
 
         <div className="coll__panel" role="tabpanel" id="painel-produto" aria-labelledby={`tab-${p.id}`} tabIndex={0} key={`p-${p.id}`}>
@@ -104,7 +100,6 @@ export function Collection() {
             className={`ctab${i === active ? " is-active" : ""}`}
             onClick={() => setActive(i)}
           >
-            <span className="ctab__num">{pr.number}</span>
             <span className="ctab__name">{pr.name}</span>
             <span className="ctab__profile">{pr.profile}</span>
           </button>

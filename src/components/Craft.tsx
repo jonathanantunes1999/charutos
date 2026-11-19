@@ -33,10 +33,6 @@ export function Craft() {
           },
         },
       });
-      // numerais em contra-movimento
-      gsap.utils.toArray<HTMLElement>(".craft__num").forEach((el) => {
-        gsap.fromTo(el, { xPercent: 14 }, { xPercent: -14, ease: "none", scrollTrigger: { trigger: pin.current, scrub: true, start: "top top", end: () => "+=" + dist() } });
-      });
     });
     return () => mm.revert();
   }, []);
@@ -46,7 +42,6 @@ export function Craft() {
       <div className="craft__pin" ref={pin}>
         <div className="craft__track" ref={track}>
           <div className="craft__intro">
-            <p className="kicker">{c.kicker}</p>
             <h2 id="oficio-titulo" className="craft__title">
               {c.title}
             </h2>
@@ -55,9 +50,6 @@ export function Craft() {
 
           {c.steps.map((s, i) => (
             <article className={`craft__step craft__step--${i + 1}`} key={s.title}>
-              <span className="craft__num" aria-hidden="true">
-                {s.number}
-              </span>
               <figure className="craft__fig" data-reveal>
                 <Picture img={s.image} smallBelow={900} style={{ objectPosition: s.focus } as CSSProperties} />
               </figure>

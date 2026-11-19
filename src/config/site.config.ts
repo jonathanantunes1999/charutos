@@ -16,7 +16,6 @@ export type Img = { src: string; srcSm?: string; alt: string };
 
 export type Product = {
   id: string;
-  number: string;
   name: string;
   profile: "Suave" | "Médio" | "Intenso";
   /** palavra gigante atrás do charuto */
@@ -46,7 +45,6 @@ export const site = {
   ],
 
   hero: {
-    eyebrow: "Charutos — conceito de coleção",
     titleLines: ["O detalhe", "revela-se", "devagar."],
     cta: { label: "Descobrir a coleção", href: "#colecao" },
     cutout: {
@@ -57,7 +55,6 @@ export const site = {
   },
 
   leaf: {
-    kicker: "01 — A folha",
     lead: ["Chega mais", "perto."],
     image: {
       src: "images/folha.webp",
@@ -65,22 +62,20 @@ export const site = {
       alt: "Macro da capa de um charuto, a passar do castanho escuro ao cobre, com a textura da folha.",
     } satisfies Img,
     notes: [
-      { n: "01", t: "Veias", d: "Caminhos finos, em relevo." },
-      { n: "02", t: "Relevo", d: "A luz rasante conta o resto." },
-      { n: "03", t: "Tom", d: "Nunca uniforme. Sempre vivo." },
+      { t: "Veias", d: "Caminhos finos, em relevo." },
+      { t: "Relevo", d: "A luz rasante conta o resto." },
+      { t: "Tom", d: "Nunca uniforme. Sempre vivo." },
     ],
   },
 
   collection: {
     id: "colecao",
-    kicker: "02 — Coleção",
     title: "Três perfis. Escolhe um.",
     disclaimer: "Perfis e notas ilustrativos, para apresentação do conceito.",
     intensityLabel: "Intensidade",
     products: [
       {
         id: "claro",
-        number: "01",
         name: "Véu Claro",
         profile: "Suave",
         word: "SUAVE",
@@ -102,7 +97,6 @@ export const site = {
       },
       {
         id: "ambar",
-        number: "02",
         name: "Véu Âmbar",
         profile: "Médio",
         word: "MÉDIO",
@@ -124,7 +118,6 @@ export const site = {
       },
       {
         id: "noite",
-        number: "03",
         name: "Véu Noite",
         profile: "Intenso",
         word: "INTENSO",
@@ -149,12 +142,10 @@ export const site = {
 
   craft: {
     id: "oficio",
-    kicker: "03 — O ofício",
     title: "O ofício",
     intro: "Um charuto é feito de camadas. Cada uma tem um trabalho.",
     steps: [
       {
-        number: "I",
         title: "A folha",
         text: "A capa é a folha que se vê e se toca. Procura-se uma superfície elástica, de tom uniforme e veias finas. É a primeira leitura do charuto.",
         image: {
@@ -165,7 +156,6 @@ export const site = {
         focus: "50% 50%",
       },
       {
-        number: "II",
         title: "A construção",
         text: "Folhas de enchimento dispostas para o ar passar, unidas por uma folha de ligação. Por dentro, o charuto é um desenho de camadas.",
         image: {
@@ -176,7 +166,6 @@ export const site = {
         focus: "50% 50%",
       },
       {
-        number: "III",
         title: "O acabamento",
         text: "A capa enrola-se em espiral, a cabeça fecha-se e o charuto descansa até estar pronto. Aqui, o detalhe é quase todo à vista.",
         image: {

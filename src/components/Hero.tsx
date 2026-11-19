@@ -4,7 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { site } from "../config/site.config";
 import { Picture } from "./Picture";
 import { Atmosphere } from "./Atmosphere";
-import { Badge } from "./Badge";
+import { TextLink } from "./TextLink";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -34,8 +34,7 @@ export function Hero() {
           .from(q(".g-l > span"), { yPercent: 118, duration: 1.7, stagger: 0.12 }, 0.05)
           .from(q(".hero__rot"), { xPercent: small ? 10 : 42, yPercent: small ? 30 : 0, rotate: base - (small ? 18 : 16), autoAlpha: 0, duration: 2.1, ease: "power4.out" }, 0.15)
           .from(q(".hero__line > span"), { yPercent: 112, duration: 1.4, stagger: 0.1 }, 0.6)
-          .from(q(".hero__eyebrow"), { opacity: 0, y: 14, duration: 1.2 }, 1)
-          .from(q(".badge"), { scale: 0, rotate: -120, duration: 1.4, ease: "back.out(1.5)" }, 1.1);
+          .from(q(".hero__cta"), { opacity: 0, y: 14, duration: 1.2 }, 1.2);
 
         // flutuação
         gsap.to(q(".hero__float"), { y: small ? -8 : -14, rotate: 0.7, duration: 4.8, ease: "sine.inOut", yoyo: true, repeat: -1 });
@@ -67,8 +66,8 @@ export function Hero() {
           .to(q(".g-l")[0], { xPercent: -45, duration: 1 }, 0)
           .to(q(".g-l")[2], { xPercent: 45, duration: 1 }, 0)
           .to(q(".g-l")[1], { yPercent: -35, opacity: 0.2, duration: 1 }, 0)
-          .to(q(".hero__copy"), { y: -70, autoAlpha: 0, duration: 0.55 }, 0)
-          .to(q(".badge"), { autoAlpha: 0, duration: 0.3 }, 0);
+          .to(q(".hero__copy"), { y: -70, autoAlpha: 0, duration: 0.55 }, 0);
+
 
         return () => off();
       },
@@ -109,7 +108,6 @@ export function Hero() {
       <div className="hero__fade" aria-hidden="true" />
 
       <div className="hero__copy">
-        <p className="hero__eyebrow">{hero.eyebrow}</p>
         <h1 className="hero__title">
           {hero.titleLines.map((line, i) => (
             <span className="hero__line" key={line}>
@@ -117,9 +115,9 @@ export function Hero() {
             </span>
           ))}
         </h1>
+        <TextLink href={hero.cta.href} label={hero.cta.label} className="hero__cta" />
       </div>
 
-      <Badge href={hero.cta.href} label={hero.cta.label} className="badge--hero" />
 
     </section>
   );

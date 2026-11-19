@@ -1,6 +1,6 @@
 import { site } from "../config/site.config";
 import { Picture } from "./Picture";
-import { Badge } from "./Badge";
+import { TextLink } from "./TextLink";
 
 export function Closing() {
   const { closing: c, footer } = site;
@@ -18,7 +18,7 @@ export function Closing() {
         <p className="end__line" data-reveal>
           {c.line}
         </p>
-        <Badge href={c.toTop.href} label={c.toTop.label} up className="badge--end" />
+        <TextLink href={c.toTop.href} label={c.toTop.label} up className="end__top" />
       </section>
       <footer className="footer">
         <p className="footer__concept">{footer.concept}</p>
