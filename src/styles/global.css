@@ -323,13 +323,6 @@ body::after {
   width: 100%;
   height: auto;
 }
-.hero__foot {
-  position: absolute;
-  right: -0.4%;
-  top: 50%;
-  width: 1px;
-  height: 1px;
-}
 .hero__shadow {
   position: absolute;
   left: 6%;
@@ -340,7 +333,7 @@ body::after {
   filter: blur(14px);
   z-index: -1;
 }
-.hero__smoke {
+.hero__dust {
   position: absolute;
   inset: 0;
   z-index: 3;

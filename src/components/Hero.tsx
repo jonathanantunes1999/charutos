@@ -15,8 +15,6 @@ gsap.registerPlugin(ScrollTrigger);
  */
 export function Hero() {
   const root = useRef<HTMLElement>(null);
-  const foot = useRef<HTMLSpanElement>(null);
-  const smokeBox = useRef<HTMLDivElement>(null);
   const { hero } = site;
 
   useLayoutEffect(() => {
@@ -80,15 +78,6 @@ export function Hero() {
 
   const letters = site.brand.second.split("");
 
-  const getOrigin = () => {
-    const f = foot.current;
-    const b = smokeBox.current;
-    if (!f || !b) return null;
-    const fr = f.getBoundingClientRect();
-    const br = b.getBoundingClientRect();
-    return { x: (fr.left + fr.width / 2 - br.left) / br.width, y: (fr.top + fr.height / 2 - br.top) / br.height };
-  };
-
   return (
     <section id="topo" className="hero" ref={root} aria-label="Abertura" tabIndex={-1}>
       <div className="hero__glow" aria-hidden="true" />
@@ -107,7 +96,6 @@ export function Hero() {
             <div className="hero__rot">
               <div className="hero__float">
                 <Picture img={hero.cutout} className="hero__img" eager />
-                <span className="hero__foot" ref={foot} aria-hidden="true" />
               </div>
               <div className="hero__shadow" aria-hidden="true" />
             </div>
@@ -115,8 +103,8 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="hero__smoke" ref={smokeBox}>
-        <Atmosphere getOrigin={getOrigin} />
+      <div className="hero__dust">
+        <Atmosphere />
       </div>
       <div className="hero__fade" aria-hidden="true" />
 

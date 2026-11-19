@@ -1,246 +1,70 @@
 import { useEffect, useRef } from "react";
 
-type Origin = { x: number; y: number } | null;
-
 /**
- * Fumo e poeira.
- *  · WebGL: shader com ruído fractal e distorção de domínio → fios finos que sobem quase retos,
- *    ondulam e abrem em volutas (como fumo real).
- *  · Alternativa 2D (sem WebGL): partículas suaves.
- * Meia resolução; pausa fora do ecrã/separador; não corre com prefers-reduced-motion.
- * `getOrigin` devolve o ponto de emissão em frações do canvas.
+ * Poeira em suspensão: partículas douradas muito discretas, em canvas 2D (meia resolução).
+ * Pausa fora do ecrã/separador e não corre com prefers-reduced-motion.
  */
-export function Atmosphere({ getOrigin }: { getOrigin: () => Origin }) {
+export function Atmosphere() {
   const ref = useRef<HTMLCanvasElement>(null);
-  const org = useRef(getOrigin);
-  org.current = getOrigin;
 
   useEffect(() => {
     const cv = ref.current;
     if (!cv || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const gl = cv.getContext("webgl", { premultipliedAlpha: true, alpha: true, antialias: false, powerPreference: "low-power" });
-    const stop = gl ? startGL(cv, gl, () => org.current()) : start2D(cv, () => org.current());
-    return stop;
-  }, []);
+    const ctx = cv.getContext("2d");
+    if (!ctx) return;
 
-  return <canvas ref={ref} className="atmo" aria-hidden="true" />;
-}
+    let W = 2;
+    let H = 2;
+    const resize = () => {
+      const r = cv.getBoundingClientRect();
+      W = cv.width = Math.max(2, Math.round(r.width * 0.5));
+      H = cv.height = Math.max(2, Math.round(r.height * 0.5));
+    };
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(cv);
 
-/* ───────────────────────── helpers comuns ───────────────────────── */
-function watch(cv: HTMLCanvasElement, onResize: (w: number, h: number) => void) {
-  const resize = () => {
-    const r = cv.getBoundingClientRect();
-    const w = Math.max(2, Math.round(r.width * 0.75));
-    const h = Math.max(2, Math.round(r.height * 0.75));
-    cv.width = w;
-    cv.height = h;
-    onResize(w, h);
-  };
-  resize();
-  const ro = new ResizeObserver(resize);
-  ro.observe(cv);
-  let visible = true;
-  const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting), { threshold: 0 });
-  io.observe(cv);
-  let hidden = document.hidden;
-  const onVis = () => (hidden = document.hidden);
-  document.addEventListener("visibilitychange", onVis);
-  return {
-    active: () => visible && !hidden,
-    off: () => {
+    const dust = Array.from({ length: 34 }, () => ({
+      x: Math.random(), y: Math.random(), r: 0.6 + Math.random() * 1.8, s: 0.004 + Math.random() * 0.012,
+      ph: Math.random() * 6.28, a: 0.15 + Math.random() * 0.5,
+    }));
+
+    let visible = true;
+    const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting), { threshold: 0 });
+    io.observe(cv);
+    let hidden = document.hidden;
+    const onVis = () => (hidden = document.hidden);
+    document.addEventListener("visibilitychange", onVis);
+
+    let last = performance.now();
+    let t = 0;
+    let raf = 0;
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop);
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      if (!visible || hidden) return;
+      t += dt;
+      ctx.clearRect(0, 0, W, H);
+      for (const d of dust) {
+        d.y -= d.s * dt;
+        d.x += Math.sin(t * 0.3 + d.ph) * 0.0004;
+        if (d.y < -0.02) d.y = 1.02;
+        const tw = 0.5 + 0.5 * Math.sin(t * 1.3 + d.ph * 3);
+        ctx.fillStyle = `rgba(255,214,170,${d.a * tw * 0.55})`;
+        ctx.beginPath();
+        ctx.arc(d.x * W, d.y * H, d.r * (W / 900), 0, 6.283);
+        ctx.fill();
+      }
+    };
+    raf = requestAnimationFrame(loop);
+    return () => {
+      cancelAnimationFrame(raf);
       ro.disconnect();
       io.disconnect();
       document.removeEventListener("visibilitychange", onVis);
-    },
-  };
-}
+    };
+  }, []);
 
-/* ───────────────────────── WebGL ───────────────────────── */
-const VERT = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }`;
-
-const FRAG = `
-precision highp float;
-uniform vec2 u_res;
-uniform float u_t;
-uniform vec2 u_org;      // origem em px (canto inferior esquerdo)
-
-float hash(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
-vec2 hash2(vec2 p){ return vec2(hash(p), hash(p+19.19)); }
-float noise(vec2 p){
-  vec2 i = floor(p), f = fract(p);
-  f = f*f*f*(f*(f*6.0-15.0)+10.0);
-  return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y);
-}
-float fbm(vec2 p){
-  float v = 0.0, a = 0.5;
-  for (int i = 0; i < 5; i++){ v += a*noise(p); p = p*2.03 + vec2(1.7, 9.2); a *= 0.5; }
-  return v;
-}
-
-float dust(vec2 uv, float t){
-  float a = 0.0;
-  for (int i = 0; i < 2; i++){
-    float sc = 11.0 + float(i)*8.0;
-    vec2 p = uv*sc; p.y -= t*(0.22 + 0.12*float(i));
-    vec2 c = floor(p), f = fract(p);
-    vec2 o = hash2(c + float(i)*7.0);
-    vec2 pos = 0.2 + 0.6*o + vec2(sin(t*0.4 + o.x*6.28)*0.12, 0.0);
-    float d = length(f - pos);
-    float sz = 0.022 + 0.03*hash(c+3.1);
-    float tw = 0.4 + 0.6*sin(t*1.4 + o.y*20.0);
-    a += smoothstep(sz, 0.0, d) * tw * step(0.62, hash(c + 11.0));
-  }
-  return a;
-}
-
-void main(){
-  float H = max(u_res.y - u_org.y, 40.0);          // espaço disponível acima da origem
-  vec2 d = (gl_FragCoord.xy - u_org) / H;          // h=1 → topo do ecrã (a pluma adapta-se)
-  float h = d.y;
-  float t = u_t;
-
-  float dens = 0.0;
-  if (h > 0.0){
-    // desvio lento da coluna (vento + ondulação)
-    float xc = 0.05*h*h + sin(h*4.2 - t*0.55)*0.03*h + sin(t*0.21)*0.035*h;
-    // dupla distorção de domínio: dá volutas em vez de linhas
-    vec2 p = vec2(d.x*2.6, h*1.9);
-    vec2 adv = vec2(0.0, -t*0.2);
-    vec2 q = vec2(fbm(p + adv), fbm(p + adv + vec2(5.2, 1.3)));
-    vec2 r = vec2(fbm(p + 3.2*q + adv*0.8 + vec2(1.7, 9.2)), fbm(p + 3.2*q + adv*0.8 + vec2(8.3, 2.8)));
-    float warp = 0.02 + 0.55*pow(h, 1.25);
-    float x = d.x - xc + (r.x - 0.5)*warp*1.6;
-    // coluna larga e macia que se abre com a altura
-    float w = 0.012 + 0.15*h;
-    float core = exp(-(x*x)/(w*w));
-    // textura de fumo: bordas esfiapadas, não linhas
-    float tex = fbm(vec2(x*9.0, h*4.2 - t*0.42) + r*2.2);
-    float wisp = smoothstep(0.30, 0.78, tex + 0.35*core);
-    dens = core * wisp;
-    dens *= smoothstep(0.0, 0.09, h) * (1.0 - smoothstep(0.38, 1.0, h));
-    dens *= 1.0/(1.0 + 0.9*h);
-  }
-  vec3 smokeCol = mix(vec3(0.86, 0.80, 0.74), vec3(0.62, 0.68, 0.76), clamp(h*1.4, 0.0, 1.0));
-  float a = clamp(dens*0.5, 0.0, 0.5);
-
-  // pó em suspensão (ligeiro, quente)
-  vec2 uv = gl_FragCoord.xy / u_res.y;
-  float ds = dust(uv, t);
-  vec3 col = smokeCol*a + vec3(1.0, 0.82, 0.6)*ds*0.5;
-  gl_FragColor = vec4(col, max(a, ds*0.5));
-}`;
-
-function startGL(cv: HTMLCanvasElement, gl: WebGLRenderingContext, getOrigin: () => Origin) {
-  const sh = (type: number, src: string) => {
-    const s = gl.createShader(type)!;
-    gl.shaderSource(s, src);
-    gl.compileShader(s);
-    return s;
-  };
-  const prog = gl.createProgram()!;
-  gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
-  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
-  gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-    console.warn("Atmosphere: shader não compilou", gl.getProgramInfoLog(prog));
-    return () => {};
-  }
-  gl.useProgram(prog);
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-  const loc = gl.getAttribLocation(prog, "p");
-  gl.enableVertexAttribArray(loc);
-  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  const uRes = gl.getUniformLocation(prog, "u_res");
-  const uT = gl.getUniformLocation(prog, "u_t");
-  const uOrg = gl.getUniformLocation(prog, "u_org");
-
-  const w = watch(cv, (W, H) => gl.viewport(0, 0, W, H));
-  const t0 = performance.now();
-  let raf = 0;
-  const loop = (now: number) => {
-    raf = requestAnimationFrame(loop);
-    if (!w.active()) return;
-    const o = getOrigin();
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    if (!o) return;
-    gl.uniform2f(uRes, cv.width, cv.height);
-    gl.uniform1f(uT, (now - t0) / 1000);
-    gl.uniform2f(uOrg, o.x * cv.width, (1 - o.y) * cv.height);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-  };
-  raf = requestAnimationFrame(loop);
-  return () => {
-    cancelAnimationFrame(raf);
-    w.off();
-    gl.getExtension("WEBGL_lose_context")?.loseContext();
-  };
-}
-
-/* ───────────────────────── alternativa 2D ───────────────────────── */
-type P = { x: number; y: number; vx: number; vy: number; age: number; life: number; size: number; a: number; seed: number };
-
-function start2D(cv: HTMLCanvasElement, getOrigin: () => Origin) {
-  const ctx = cv.getContext("2d");
-  if (!ctx) return () => {};
-  const sprite = document.createElement("canvas");
-  sprite.width = sprite.height = 96;
-  const sg = sprite.getContext("2d")!;
-  const g = sg.createRadialGradient(48, 48, 0, 48, 48, 48);
-  g.addColorStop(0, "rgba(255,236,214,1)");
-  g.addColorStop(0.35, "rgba(236,208,180,0.45)");
-  g.addColorStop(1, "rgba(220,190,160,0)");
-  sg.fillStyle = g;
-  sg.fillRect(0, 0, 96, 96);
-  let W = 2;
-  let H = 2;
-  const w = watch(cv, (a, b) => ((W = a), (H = b)));
-  const smoke: P[] = [];
-  let last = performance.now();
-  let acc = 0;
-  let t = 0;
-  let raf = 0;
-  const loop = (now: number) => {
-    raf = requestAnimationFrame(loop);
-    const dt = Math.min(0.05, (now - last) / 1000);
-    last = now;
-    if (!w.active()) return;
-    t += dt;
-    const o = getOrigin();
-    if (o) acc = Math.min(acc + dt * 70, 3);
-    while (acc > 1 && o) {
-      acc -= 1;
-      smoke.push({
-        x: o.x * W + (Math.random() - 0.5) * W * 0.012, y: o.y * H, vx: (Math.random() - 0.5) * 6,
-        vy: -(26 + Math.random() * 26) * (H / 500), age: 0, life: 5 + Math.random() * 4,
-        size: 4 + Math.random() * 6, a: 0.03 + Math.random() * 0.04, seed: Math.random() * 100,
-      });
-    }
-    ctx.clearRect(0, 0, W, H);
-    ctx.globalCompositeOperation = "lighter";
-    for (let i = smoke.length - 1; i >= 0; i--) {
-      const p = smoke[i];
-      p.age += dt;
-      if (p.age > p.life) {
-        smoke.splice(i, 1);
-        continue;
-      }
-      const u = p.age / p.life;
-      p.vx += (Math.sin(p.y * 0.022 + p.seed + t * 0.8) * 14 + Math.sin(p.y * 0.009 + t * 0.3) * 8 + 5) * dt;
-      p.vx *= 0.985;
-      p.x += p.vx * dt * (W / 700);
-      p.y += p.vy * dt;
-      const s = (p.size + u * 38) * (W / 700);
-      ctx.globalAlpha = p.a * Math.sin(Math.PI * u) ** 1.4;
-      ctx.drawImage(sprite, p.x - s / 2, p.y - s / 2, s, s);
-    }
-    ctx.globalAlpha = 1;
-  };
-  raf = requestAnimationFrame(loop);
-  return () => {
-    cancelAnimationFrame(raf);
-    w.off();
-  };
+  return <canvas ref={ref} className="atmo" aria-hidden="true" />;
 }
