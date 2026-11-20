@@ -1216,3 +1216,20 @@ button.tlink {
   .coll__line { order: -2; }
   .coll__more { order: -1; margin-top: -4px; }
 }
+
+@media (max-width: 760px) {
+  .end {
+    min-height: calc(100svh - var(--footer-h, 130px)); /* fecho + rodapé = um ecrã */
+    padding-top: clamp(84px, 13svh, 130px);
+    padding-bottom: clamp(30px, 5svh, 50px);
+  }
+  .end__bg {
+    height: 58%;
+  }
+  .end__bg img {
+    object-position: 50.7% 50%;
+  }
+  .end__giant span {
+    font-size: min(34vw, 30svh);
+  }
+}
