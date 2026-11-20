@@ -20,6 +20,7 @@ function parse(hash: string) {
 
 function Home() {
   useReveal();
+  const [active, setActive] = useState(0);
   useEffect(() => {
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener("load", refresh);
@@ -38,8 +39,8 @@ function Home() {
   }, []);
   return (
     <main>
-      <Hero />
-      <Collection />
+      <Hero profile={active} />
+      <Collection active={active} onChange={setActive} />
       <Craft />
       <Closing />
     </main>

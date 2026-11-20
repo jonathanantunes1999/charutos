@@ -1,11 +1,10 @@
-import { useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { useRef, type CSSProperties, type KeyboardEvent } from "react";
 import { site } from "../config/site.config";
 import { Picture } from "./Picture";
 import { TextLink } from "./TextLink";
 
-export function Collection() {
+export function Collection({ active, onChange: setActive }: { active: number; onChange: (i: number) => void }) {
   const { collection: c } = site;
-  const [active, setActive] = useState(0);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const p = c.products[active];
 

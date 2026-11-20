@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
  * Camadas do charuto (para animações sem conflito):
  *   scroll → rato (parallax) → entrada (rotação/escala) → flutuação
  */
-export function Hero() {
+export function Hero({ profile = 0 }: { profile?: number }) {
   const root = useRef<HTMLElement>(null);
   const { hero } = site;
 
@@ -69,31 +69,32 @@ export function Hero() {
         };
         const ease = (x: number) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
 
-        // pose de aterragem medida com a coleção no topo do ecrã (independente do scroll)
-        const landing = () => {
+        // pose do charuto da coleção, medida AGORA (segue o scroll): o charuto viajante aterra
+        // sempre em cima dele, por isso a troca pode acontecer em qualquer ponto depois de chegar
+        const live = () => {
           const t = document.querySelector<HTMLElement>(".coll__cigar");
           const c = document.getElementById("colecao");
           if (!t || !c) return null;
           const tr = t.getBoundingClientRect();
-          const cr = c.getBoundingClientRect();
           const br = box.getBoundingClientRect();
           return {
-            x: tr.left + tr.width / 2 - (br.left + br.width / 2),
-            y: tr.top - cr.top + tr.height / 2 - (br.top + br.height / 2),
+            dx: tr.left + tr.width / 2 - (br.left + br.width / 2),
+            dy: tr.top + tr.height / 2 - (br.top + br.height / 2),
             s: t.offsetWidth / floatEl.offsetWidth,
             top: c.offsetTop,
           };
         };
+        const END = 0.8; // a viagem termina aos 80% do percurso, antes de a coleção chegar ao topo
 
         let s = -1; // progresso suavizado
         let wasZero = false;
         const tick = (time: number, delta: number) => {
-          const L = landing();
+          const L = live();
           if (!L) return;
           const dt = Math.min(delta, 50) / 1000;
-          const target = clamp(window.scrollY / Math.max(L.top, 1));
-          s = s < 0 ? target : s + (target - s) * (1 - Math.exp(-dt * 7));
-          if (Math.abs(target - s) < 0.0006) s = target;
+          const target = clamp(window.scrollY / Math.max(L.top * END, 1));
+          s = s < 0 ? target : s + (target - s) * (1 - Math.exp(-dt * 8));
+          if (Math.abs(target - s) < 0.002) s = target;
           const e = ease(s);
           const k = 1 - smooth(0, 0.45, e); // flutuar e rato desvanecem-se durante a viagem
 
@@ -106,18 +107,16 @@ export function Hero() {
           }
 
           if (e > 0 || !wasZero) {
-            const over = Math.max(0, window.scrollY - L.top); // charuto da coleção já subiu esta distância
             gsap.set(scrollEl, {
-              x: L.x * e,
-              y: (L.y - over) * e,
+              x: L.dx * e,
+              y: L.dy * e,
               scale: 1 + (L.s - 1) * e,
               rotation: (landAngle - base) * e,
             });
             wasZero = e === 0;
           }
-          if (toImg) toImg.style.opacity = String(smooth(0.35, 0.92, e));
-          // só troca quando a coleção está mesmo no topo (aí as duas poses coincidem)
-          const landed = target >= 0.999 && e >= 0.995;
+          if (toImg) toImg.style.opacity = String(smooth(0.3, 0.9, e));
+          const landed = s >= 0.999; // chegou: daqui para a frente o charuto da coleção é o que se vê
           box.style.visibility = landed ? "hidden" : "visible";
           if (collWrap) collWrap.style.opacity = landed ? "1" : "0";
         };
@@ -166,7 +165,7 @@ export function Hero() {
             <div className="hero__rot">
               <div className="hero__float">
                 <Picture img={hero.cutout} className="hero__img" eager />
-                <Picture img={site.collection.products[0].cutout} className="hero__img hero__img--to" decorative />
+                <Picture img={site.collection.products[profile].cutout} className="hero__img hero__img--to" decorative />
               </div>
               <div className="hero__shadow" aria-hidden="true" />
             </div>
