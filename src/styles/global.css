@@ -113,6 +113,10 @@ em {
   line-height: 1;
   white-space: nowrap;
 }
+.wordmark__mono {
+  letter-spacing: 0.2em;
+  font-size: 1.25em;
+}
 .wordmark small {
   font-family: var(--sans);
   font-size: 0.5em;
@@ -1323,4 +1327,12 @@ button.tlink {
   .coll-pin--on .coll__cigar-in {
     transform: translate3d(calc(var(--p, 0) * -7vw), calc(var(--p, 0) * 0.8vh), 0) rotate(calc(var(--p, 0) * 2.4deg));
   }
+}
+
+@media (max-width: 400px) {
+  .wordmark small { display: none; }
+}
+.order__caption .order__name {
+  font-style: normal;
+  color: var(--ivory);
 }

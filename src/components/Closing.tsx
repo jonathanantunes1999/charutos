@@ -25,8 +25,8 @@ export function Closing() {
         </div>
         <div className="end__shade" aria-hidden="true" />
         <div className="end__giant" aria-hidden="true" data-reveal>
-          <small>{site.brand.first}</small>
-          <span>{site.brand.second}</span>
+          <small>{site.brand.name}</small>
+          <span>{site.brand.mono}</span>
         </div>
         <p className="end__line" data-reveal>
           {c.line}

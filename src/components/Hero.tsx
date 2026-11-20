@@ -145,7 +145,7 @@ export function Hero({ profile = 0 }: { profile?: number }) {
     return () => mm.revert();
   }, []);
 
-  const letters = site.brand.second.split("");
+  const letters = site.brand.mono.split("");
 
   return (
     <section id="topo" className="hero" ref={root} aria-label="Abertura" tabIndex={-1}>

@@ -1,6 +1,6 @@
 /**
  * ─────────────────────────────────────────────────────────────
- *  CASA VÉU · ficheiro único de configuração
+ *  MARCO PAULO · ficheiro único de configuração
  * ─────────────────────────────────────────────────────────────
  *  Nome, textos, produtos e caminhos das imagens.
  *  Imagens: ficheiros em /public/images (caminhos relativos a /public).
@@ -31,11 +31,13 @@ export type Product = {
 
 export const site = {
   brand: {
-    /** Nome de trabalho. Troca aqui e o wordmark, o título da página e o rodapé acompanham. */
-    first: "CASA",
-    second: "VÉU",
+    /** Nome do cliente (a marca dos charutos ainda não está definida). Troca aqui e o wordmark,
+     *  o título da página e o rodapé acompanham. */
+    name: "Marco Paulo",
+    /** Monograma: usado nas letras gigantes do hero e do fecho. */
+    mono: "MP",
     get full() {
-      return `${this.first} ${this.second}`;
+      return this.name;
     },
   },
 
@@ -62,7 +64,7 @@ export const site = {
     products: [
       {
         id: "claro",
-        name: "Véu Claro",
+        name: "Claro",
         profile: "Suave",
         word: "SUAVE",
         intensity: 1,
@@ -83,7 +85,7 @@ export const site = {
       },
       {
         id: "ambar",
-        name: "Véu Âmbar",
+        name: "Âmbar",
         profile: "Médio",
         word: "MÉDIO",
         intensity: 2,
@@ -104,7 +106,7 @@ export const site = {
       },
       {
         id: "noite",
-        name: "Véu Noite",
+        name: "Noite",
         profile: "Intenso",
         word: "INTENSO",
         intensity: 3,

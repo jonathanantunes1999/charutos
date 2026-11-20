@@ -1,6 +1,6 @@
-# CASA VÉU — conceito visual (homepage)
+# Marco Paulo — conceito visual (homepage)
 
-Proposta visual para uma marca de charutos. **CASA VÉU** é um nome de trabalho; tudo é ilustrativo.
+Proposta visual para charutos de **Marco Paulo** (nome do cliente; a marca dos charutos ainda não está definida). Perfis, notas e textos são ilustrativos.
 
 ## Correr
 
@@ -25,7 +25,7 @@ A build usa caminhos relativos (`base: "./"`): funciona em qualquer pasta ou dom
 
 ## Trocar nome, textos, produtos e imagens
 
-Tudo está em **`src/config/site.config.ts`**: nome (`brand`), textos, produtos (nome, perfil, notas, detalhes, **cores do bloco**) e caminhos das imagens.
+Tudo está em **`src/config/site.config.ts`**: nome e monograma (`brand`), textos, produtos (nome, perfil, notas, detalhes, **cores do bloco**) e caminhos das imagens.
 Logótipo real: substituir `src/components/Wordmark.tsx` por um `<svg>`.
 
 ### Imagens (`public/images/`)
