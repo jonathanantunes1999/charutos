@@ -60,8 +60,3 @@ Reprocessar: `pip install numpy pillow opencv-python-headless && python3 scripts
 - Ordem de teclado correta; foco visível; ligação "Saltar para o conteúdo".
 - O site tem `noindex` (conceito de apresentação, não deve ser indexado).
 - Falta testar em dispositivos reais (só Chromium emulado), e em Safari/Firefox.
-
-## Domínio
-
-Publicado no GitHub Pages (Settings → Pages → Branch → `/docs`) com domínio próprio **marcopaulo.blankstudios.pt**.
-O ficheiro `public/CNAME` (copiado para `docs/CNAME` no `npm run build:pages`) tem de manter-se. DNS: registo `CNAME` de `marcopaulo` para `jonathanantunes1999.github.io`.
