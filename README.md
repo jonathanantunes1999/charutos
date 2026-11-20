@@ -18,7 +18,7 @@ A build usa caminhos relativos (`base: "./"`): funciona em qualquer pasta ou dom
 
 1. **Hero** — palavra gigante atrás, charuto recortado a cruzar o ecrã (parallax com o rato) e poeira dourada discreta.
 2. **Transição** — ao fazer scroll, o charuto do hero viaja e pousa exatamente no charuto da coleção (pose calculada a cada fotograma, sem duplicar silhuetas).
-3. **Coleção** — três blocos de cor (verde, terracota, vinho); cada perfil muda cor, palavra gigante, charuto e painel. Teclado (setas, Home, End), toque e, no telemóvel, deslizar o dedo sobre o charuto. Cada perfil tem "Mais informação" → encomendas.
+3. **Coleção** — a secção fica fixa no ecrã e o **scroll percorre os três perfis** (desce: Claro → Âmbar → Noite; sobe: o contrário), cada um com a sua cor, palavra gigante, charuto e painel. Abas, teclado (setas, Home, End) e, no telemóvel, deslizar sobre o charuto movem o scroll para o perfil escolhido. Com movimento reduzido ou ecrã muito baixo (< 561 px), fica estática e navega-se só pelas abas. Cada perfil tem "Mais informação" → encomendas. (Duração: `180svh` em `.coll-pin--on`, 60svh por perfil.)
 4. **O ofício** — papel marfim; em desktop, pista horizontal fixada ao scroll; em mobile, coluna.
 5. **Fecho** — wordmark gigante, fotografia e "Voltar ao topo".
 6. **Encomendas** (`#/encomendas?perfil=…`) — pedido de encomenda de conceito.

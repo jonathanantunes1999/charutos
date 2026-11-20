@@ -1,20 +1,72 @@
-import { useRef, type CSSProperties, type KeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { site } from "../config/site.config";
 import { Picture } from "./Picture";
 import { TextLink } from "./TextLink";
 
+const PIN_QUERY = "(prefers-reduced-motion: no-preference) and (min-height: 561px)";
+
+/**
+ * A secção fica fixa no ecrã e o scroll percorre os três perfis (desce: 1→2→3; sobe: 3→2→1).
+ * O scroll é a única fonte de verdade: abas, teclado e deslize movem o scroll para o sítio do perfil.
+ */
 export function Collection({ active, onChange: setActive }: { active: number; onChange: (i: number) => void }) {
   const { collection: c } = site;
+  const N = c.products.length;
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
+  const wrap = useRef<HTMLDivElement>(null);
+  const activeRef = useRef(active);
+  activeRef.current = active;
+  const lock = useRef<{ on: boolean; t: number }>({ on: false, t: 0 });
   const p = c.products[active];
+
+  const [pinned, setPinned] = useState(() => window.matchMedia(PIN_QUERY).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(PIN_QUERY);
+    const on = () => setPinned(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+
+  // scroll → perfil
+  useLayoutEffect(() => {
+    if (!pinned || !wrap.current) return;
+    const st = ScrollTrigger.create({
+      trigger: wrap.current,
+      start: "top top",
+      end: "bottom bottom",
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        if (lock.current.on) {
+          // a seguir a um clique/gesto: espera que o scroll pare, sem passar pelos perfis intermédios
+          window.clearTimeout(lock.current.t);
+          lock.current.t = window.setTimeout(() => (lock.current.on = false), 160);
+          return;
+        }
+        const i = Math.min(N - 1, Math.floor(self.progress * N));
+        if (i !== activeRef.current) setActive(i);
+      },
+    });
+    return () => st.kill();
+  }, [pinned, N, setActive]);
+
+  // perfil → scroll
+  const goTo = (i: number) => {
+    const next = Math.max(0, Math.min(N - 1, i));
+    setActive(next);
+    const w = wrap.current;
+    if (!pinned || !w) return;
+    const top = w.getBoundingClientRect().top + window.scrollY;
+    const dist = w.offsetHeight - window.innerHeight;
+    lock.current.on = true;
+    window.clearTimeout(lock.current.t);
+    lock.current.t = window.setTimeout(() => (lock.current.on = false), 900);
+    window.scrollTo({ top: top + dist * ((next + 0.5) / N), behavior: "smooth" });
+  };
 
   // deslizar o dedo sobre o charuto muda de perfil (só toque; o scroll vertical continua livre)
   const swipe = useRef<{ x: number; y: number } | null>(null);
-  const go = (d: number) => {
-    const cnt = c.products.length;
-    const next = (active + d + cnt) % cnt;
-    setActive(next);
-  };
+  const go = (d: number) => goTo(activeRef.current + d);
   const onDown = (e: React.PointerEvent) => {
     if (e.pointerType === "touch") swipe.current = { x: e.clientX, y: e.clientY };
   };
@@ -28,26 +80,24 @@ export function Collection({ active, onChange: setActive }: { active: number; on
   };
 
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
-    const cnt = c.products.length;
     let next = active;
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (active + 1) % cnt;
-    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (active - 1 + cnt) % cnt;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = Math.min(N - 1, active + 1);
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = Math.max(0, active - 1);
     else if (e.key === "Home") next = 0;
-    else if (e.key === "End") next = cnt - 1;
+    else if (e.key === "End") next = N - 1;
     else return;
     e.preventDefault();
-    setActive(next);
+    goTo(next);
     tabs.current[next]?.focus();
   };
 
   const n = p.word.length;
 
   return (
+    <div id={c.id} ref={wrap} className={`coll-pin${pinned ? " coll-pin--on" : ""}`} tabIndex={-1}>
     <section
-      id={c.id}
       className="coll"
       aria-labelledby="colecao-titulo"
-      tabIndex={-1}
       style={{ ["--bg" as string]: p.theme.bg, ["--glow" as string]: p.theme.glow } as CSSProperties}
     >
       <header className="coll__head" data-reveal>
@@ -68,7 +118,7 @@ export function Collection({ active, onChange: setActive }: { active: number; on
             aria-controls="painel-produto"
             tabIndex={i === active ? 0 : -1}
             className={`ctab${i === active ? " is-active" : ""}`}
-            onClick={() => setActive(i)}
+            onClick={() => goTo(i)}
           >
             <span className="ctab__name">{pr.name}</span>
             <span className="ctab__profile">{pr.profile}</span>
@@ -129,5 +179,6 @@ export function Collection({ active, onChange: setActive }: { active: number; on
 
       <p className="coll__disclaimer">{c.disclaimer}</p>
     </section>
+    </div>
   );
 }
