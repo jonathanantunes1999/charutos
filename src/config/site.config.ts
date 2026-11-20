@@ -159,7 +159,7 @@ export const site = {
         text: "A capa é a folha que se vê e se toca. Procura-se uma superfície elástica, de tom uniforme e veias finas. É a primeira leitura do charuto.",
         image: {
           src: "images/hero-lit.webp",
-          srcSm: "images/hero-lit-m.webp",
+          srcSm: "images/hero-lit-sm.webp",
           alt: "Macro da capa de um charuto, com uma fissura na folha e a transição do escuro para o cobre.",
         } satisfies Img,
         focus: "50% 50%",

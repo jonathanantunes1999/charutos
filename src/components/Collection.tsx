@@ -57,6 +57,25 @@ export function Collection() {
         </h2>
       </header>
 
+      <div className="coll__tabs" role="tablist" aria-label="Perfis da coleção" onKeyDown={onKey}>
+        {c.products.map((pr, i) => (
+          <button
+            key={pr.id}
+            ref={(el) => void (tabs.current[i] = el)}
+            role="tab"
+            type="button"
+            id={`tab-${pr.id}`}
+            aria-selected={i === active}
+            aria-controls="painel-produto"
+            tabIndex={i === active ? 0 : -1}
+            className={`ctab${i === active ? " is-active" : ""}`}
+            onClick={() => setActive(i)}
+          >
+            <span className="ctab__name">{pr.name}</span>
+            <span className="ctab__profile">{pr.profile}</span>
+          </button>
+        ))}
+      </div>
       <div className="coll__body">
         <div className="coll__stage" onPointerDown={onDown} onPointerUp={onUp} onPointerCancel={() => (swipe.current = null)}>
           <div className="coll__halo" aria-hidden="true" />
@@ -109,25 +128,6 @@ export function Collection() {
         </div>
       </div>
 
-      <div className="coll__tabs" role="tablist" aria-label="Perfis da coleção" onKeyDown={onKey}>
-        {c.products.map((pr, i) => (
-          <button
-            key={pr.id}
-            ref={(el) => void (tabs.current[i] = el)}
-            role="tab"
-            type="button"
-            id={`tab-${pr.id}`}
-            aria-selected={i === active}
-            aria-controls="painel-produto"
-            tabIndex={i === active ? 0 : -1}
-            className={`ctab${i === active ? " is-active" : ""}`}
-            onClick={() => setActive(i)}
-          >
-            <span className="ctab__name">{pr.name}</span>
-            <span className="ctab__profile">{pr.profile}</span>
-          </button>
-        ))}
-      </div>
       <p className="coll__disclaimer">{c.disclaimer}</p>
     </section>
   );

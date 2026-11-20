@@ -155,14 +155,14 @@ def save_rgba(arr, name, width):
     im = Image.fromarray(arr, "RGBA")
     if im.width > width:
         im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
-    im.save(os.path.join(OUT, name + ".webp"), quality=90, alpha_quality=100, method=6)
+    im.save(os.path.join(OUT, name + ".webp"), quality=84, alpha_quality=100, method=6)
     sm = im.resize((1200, round(1200 * im.height / im.width)), Image.LANCZOS)
-    sm.save(os.path.join(OUT, name + "-sm.webp"), quality=86, alpha_quality=100, method=6)
+    sm.save(os.path.join(OUT, name + "-sm.webp"), quality=80, alpha_quality=100, method=6)
     print("  ->", name, im.size)
 
 
 # ─────────────────────────────── 4. recortes macro e fecho
-def crop_save(im, box, size, name, sharpen=0.7, grain=2.2, q=82, sm_w=900):
+def crop_save(im, box, size, name, sharpen=0.5, grain=0, q=76, sm_w=700):
     x, y, w, h = box
     c = Image.fromarray(cv2.cvtColor(im[y:y + h, x:x + w], cv2.COLOR_BGR2RGB)).resize(size, Image.LANCZOS)
     a = np.asarray(c).astype(np.float32)
@@ -201,10 +201,7 @@ def main():
     crop_save(clean, (2880, 1730, 464, 580), (1000, 1250), "hero-lit")           # ofício I  (fissura da folha)
     crop_save(clean, (880, 1730, 464, 580), (1000, 1250), "estrutura")           # ofício II (extremo cortado)
     crop_save(clean, (4830, 1710, 464, 580), (1000, 1250), "acabamento")         # ofício III (ponta)
-    crop_save(clean, (0, 484, 6144, 3072), (2560, 1280), "fecho", sharpen=0.4, grain=1.6, sm_w=1000)
-    # a versão "-m" do hero-lit só existe por compatibilidade com o config antigo
-    import shutil
-    shutil.copy(os.path.join(OUT, "hero-lit.webp"), os.path.join(OUT, "hero-lit-m.webp"))
+    crop_save(clean, (0, 484, 6144, 3072), (2560, 1280), "fecho", sharpen=0.3, grain=0, q=72, sm_w=1000)
 
 
 if __name__ == "__main__":

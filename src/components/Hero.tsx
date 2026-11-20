@@ -132,7 +132,7 @@ export function Hero() {
           .to(q(".g-l")[0], { xPercent: -45, duration: 1 }, 0)
           .to(q(".g-l")[2], { xPercent: 45, duration: 1 }, 0)
           .to(q(".g-l")[1], { yPercent: -35, opacity: 0.2, duration: 1 }, 0)
-          .to(q(".hero__copy"), { y: -70, autoAlpha: 0, duration: 0.55 }, 0);
+          .to(q(".hero__copy"), { y: -70, opacity: 0, duration: 0.55 }, 0);
 
         return () => {
           gsap.ticker.remove(tick);
@@ -166,7 +166,7 @@ export function Hero() {
             <div className="hero__rot">
               <div className="hero__float">
                 <Picture img={hero.cutout} className="hero__img" eager />
-                <Picture img={site.collection.products[0].cutout} className="hero__img hero__img--to" decorative eager />
+                <Picture img={site.collection.products[0].cutout} className="hero__img hero__img--to" decorative />
               </div>
               <div className="hero__shadow" aria-hidden="true" />
             </div>

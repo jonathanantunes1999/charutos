@@ -39,7 +39,7 @@ export function Orders({ profile }: { profile: string | null }) {
               <Picture img={p.cutout} smallBelow={900} eager />
             </div>
             <div className="order__caption">
-              <h2>{p.name}</h2>
+              <p className="order__name">{p.name}</p>
               <p>{p.line}</p>
               <ul aria-label="Notas">
                 {p.notes.map((n) => (

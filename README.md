@@ -16,10 +16,12 @@ A build usa caminhos relativos (`base: "./"`): funciona em qualquer pasta ou dom
 
 ## Estrutura da página
 
-1. **Hero** — palavra gigante atrás, charuto recortado a cruzar o ecrã (parallax com o rato), fumo e poeira, botão circular com texto a rodar.
-2. **Coleção** — três blocos de cor (verde, terracota, vinho); cada charuto muda cor, palavra gigante, charuto e painel. Teclado (setas, Home, End), toque e, no telemóvel, deslizar o dedo sobre o charuto.
-3. **O ofício** — papel marfim; em desktop, pista horizontal fixada ao scroll; em mobile, coluna.
-4. **Fecho** — wordmark gigante, imagem e "voltar ao topo".
+1. **Hero** — palavra gigante atrás, charuto recortado a cruzar o ecrã (parallax com o rato) e poeira dourada discreta.
+2. **Transição** — ao fazer scroll, o charuto do hero viaja e pousa exatamente no charuto da coleção (pose calculada a cada fotograma, sem duplicar silhuetas).
+3. **Coleção** — três blocos de cor (verde, terracota, vinho); cada perfil muda cor, palavra gigante, charuto e painel. Teclado (setas, Home, End), toque e, no telemóvel, deslizar o dedo sobre o charuto. Cada perfil tem "Mais informação" → encomendas.
+4. **O ofício** — papel marfim; em desktop, pista horizontal fixada ao scroll; em mobile, coluna.
+5. **Fecho** — wordmark gigante, fotografia e "Voltar ao topo".
+6. **Encomendas** (`#/encomendas?perfil=…`) — pedido de encomenda de conceito.
 
 ## Trocar nome, textos, produtos e imagens
 
@@ -45,8 +47,16 @@ Reprocessar: `pip install numpy pillow opencv-python-headless && python3 scripts
 
 ## Notas
 
-- `prefers-reduced-motion`: sem pin/zoom; as frases e imagens aparecem como blocos estáticos e a pista do ofício passa a coluna.
+- `prefers-reduced-motion`: sem viagem do charuto, pin nem poeira; as frases e imagens aparecem como blocos estáticos e a pista do ofício passa a coluna.
 - O scroll é sempre o nativo (`sticky`/pin do ScrollTrigger; nunca se sequestra o scroll).
 - Publicidade a tabaco é muito restrita em Portugal/UE: validar legalmente antes de publicar.
 
 - **Encomendas** (`#/encomendas?perfil=claro|ambar|noite`): rota por hash (funciona no GitHub Pages). É um *pedido de encomenda* de conceito: valida o formulário e mostra confirmação, **não envia dados nem processa pagamentos**. Para o tornar real, ligar o `onSubmit` em `src/components/Orders.tsx` a um serviço de formulários/email. Texto em `site.orders`.
+
+## Estado de qualidade (auditoria)
+
+- `axe-core` (WCAG 2.1 AA + boas práticas) sem violações em 22 estados: topo, a meio da viagem, os 3 perfis, ofício, fecho, as 3 páginas de encomenda e a confirmação, em desktop e mobile.
+- Sem deslocamento horizontal nem texto cortado de 320 a 2560 px; alvos de toque ≥ 44 px no mobile.
+- Ordem de teclado correta; foco visível; ligação "Saltar para o conteúdo".
+- O site tem `noindex` (conceito de apresentação, não deve ser indexado).
+- Falta testar em dispositivos reais (só Chromium emulado), e em Safari/Firefox.
