@@ -37,6 +37,10 @@ export function Collection({ active, onChange: setActive }: { active: number; on
       end: "bottom bottom",
       invalidateOnRefresh: true,
       onUpdate: (self) => {
+        const el = wrap.current!;
+        el.style.setProperty("--p", self.progress.toFixed(4));
+        const idx = Math.min(N - 1, Math.floor(self.progress * N));
+        el.style.setProperty("--seg", (self.progress * N - idx).toFixed(3));
         if (lock.current.on) {
           // a seguir a um clique/gesto: espera que o scroll pare, sem passar pelos perfis intermédios
           window.clearTimeout(lock.current.t);
@@ -136,9 +140,13 @@ export function Collection({ active, onChange: setActive }: { active: number; on
             ))}
           </div>
           <div className="coll__cigar-wrap">
-            <div className="coll__cigar" key={`c-${p.id}`}>
+            <div className="coll__cigar">
               <div className="coll__cigar-in">
-                <Picture img={p.cutout} smallBelow={900} eager />
+                {c.products.map((pr, i) => (
+                  <div key={pr.id} className={`coll__layer${i === active ? " is-on" : ""}`}>
+                    <Picture img={pr.cutout} smallBelow={900} eager={i === 0} decorative={i !== active} />
+                  </div>
+                ))}
               </div>
               <div className="coll__shadow" aria-hidden="true" />
             </div>

@@ -390,18 +390,28 @@ em {
   top: 50%;
   width: 66vw;
   transform: translate(-50%, -50%) rotate(-12deg);
-  animation: cigar-in 1.3s var(--ease) both;
   pointer-events: none;
 }
-@keyframes cigar-in {
-  from { opacity: 0; transform: translate(-30%, -50%) rotate(-26deg); }
-}
 .coll__cigar-in {
+  position: relative;
   width: 100%;
+  aspect-ratio: 2400 / 364;
+  /* o charuto desloca-se de forma contínua com o scroll (--p: 0→1) */
+  transform: translate3d(calc(var(--p, 0) * -5vw), calc(var(--p, 0) * 1.4vh), 0) rotate(calc(var(--p, 0) * 2.4deg));
+  will-change: transform;
 }
-.coll__cigar img {
+.coll__layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.coll__layer.is-on {
+  opacity: 1;
+}
+.coll__layer img {
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 .coll__shadow {
   position: absolute;
@@ -532,7 +542,7 @@ em {
   color: var(--ivory);
 }
 .ctab.is-active::before {
-  transform: scaleX(1);
+  transform: scaleX(var(--ctab-fill, 1));
 }
 .ctab:focus-visible {
   outline-color: var(--ivory);
@@ -842,9 +852,6 @@ em {
     left: 50%;
     width: 112vw;
     transform: translate(-50%, -50%) rotate(-20deg);
-  }
-  @keyframes cigar-in {
-    from { opacity: 0; transform: translate(-36%, -46%) rotate(-34deg); }
   }
   .ctab {
     grid-template-columns: 1fr;
@@ -1303,4 +1310,17 @@ button.tlink {
   /* alturas estáveis entre perfis: as abas não saltam */
   .coll-pin--on .coll__line { min-height: 2.5em; }
   .coll-pin--on .notes { min-height: 84px; align-content: flex-start; }
+}
+
+/* a barra da aba ativa vai enchendo com o scroll dentro do perfil */
+.coll-pin--on .ctab::before {
+  transition: transform 0.25s linear;
+}
+.coll-pin--on .ctab.is-active::before {
+  transform: scaleX(calc(0.3 + 0.7 * var(--seg, 1)));
+}
+@media (max-width: 900px) {
+  .coll-pin--on .coll__cigar-in {
+    transform: translate3d(calc(var(--p, 0) * -7vw), calc(var(--p, 0) * 0.8vh), 0) rotate(calc(var(--p, 0) * 2.4deg));
+  }
 }
