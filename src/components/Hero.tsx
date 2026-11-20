@@ -123,15 +123,18 @@ export function Hero({ profile = 0 }: { profile?: number }) {
         gsap.ticker.add(tick);
 
         // letras gigantes e texto acompanham o scroll
-        gsap
-          .timeline({
-            defaults: { ease: "none" },
-            scrollTrigger: { trigger: heroEl, start: "top top", end: "bottom top", scrub: 0.6 },
-          })
-          .to(q(".g-l")[0], { xPercent: -45, duration: 1 }, 0)
-          .to(q(".g-l")[2], { xPercent: 45, duration: 1 }, 0)
-          .to(q(".g-l")[1], { yPercent: -35, opacity: 0.2, duration: 1 }, 0)
-          .to(q(".hero__copy"), { y: -70, opacity: 0, duration: 0.55 }, 0);
+        const st = gsap.timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: { trigger: heroEl, start: "top top", end: "bottom top", scrub: 0.6 },
+        });
+        // a primeira letra vai para a esquerda, a última para a direita, as do meio sobem (qualquer nº de letras)
+        const gl = q(".g-l");
+        gl.forEach((el, i) => {
+          if (i === 0) st.to(el, { xPercent: -45, duration: 1 }, 0);
+          else if (i === gl.length - 1) st.to(el, { xPercent: 45, duration: 1 }, 0);
+          else st.to(el, { yPercent: -35, opacity: 0.2, duration: 1 }, 0);
+        });
+        st.to(q(".hero__copy"), { y: -70, opacity: 0, duration: 0.55 }, 0);
 
         return () => {
           gsap.ticker.remove(tick);
