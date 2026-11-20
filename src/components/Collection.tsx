@@ -4,7 +4,7 @@ import { Picture } from "./Picture";
 
 export function Collection() {
   const { collection: c } = site;
-  const [active, setActive] = useState(1);
+  const [active, setActive] = useState(0);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const p = c.products[active];
 
@@ -50,7 +50,7 @@ export function Collection() {
           <div className="coll__cigar-wrap">
             <div className="coll__cigar" key={`c-${p.id}`}>
               <div className="coll__cigar-in">
-                <Picture img={p.cutout} smallBelow={900} />
+                <Picture img={p.cutout} smallBelow={900} eager />
               </div>
               <div className="coll__shadow" aria-hidden="true" />
             </div>
