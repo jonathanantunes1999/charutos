@@ -1238,3 +1238,21 @@ button.tlink {
 }
 .coll__halo { pointer-events: none; }
 .coll__tabs { position: relative; z-index: 4; }
+
+/* fundo suave do cabeçalho: degradê + desfoque que se dissolve para baixo */
+.header::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 -34px 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(10, 8, 7, 0.72) 0%, rgba(10, 8, 7, 0.38) 55%, rgba(10, 8, 7, 0) 100%);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+  transition: background 0.3s;
+}
+.header--ink::before {
+  background: linear-gradient(to bottom, rgba(231, 220, 198, 0.9) 0%, rgba(231, 220, 198, 0.5) 55%, rgba(231, 220, 198, 0) 100%);
+}
