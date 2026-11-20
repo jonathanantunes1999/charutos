@@ -48,3 +48,5 @@ Reprocessar: `pip install numpy pillow opencv-python-headless && python3 scripts
 - `prefers-reduced-motion`: sem pin/zoom; as frases e imagens aparecem como blocos estáticos e a pista do ofício passa a coluna.
 - O scroll é sempre o nativo (`sticky`/pin do ScrollTrigger; nunca se sequestra o scroll).
 - Publicidade a tabaco é muito restrita em Portugal/UE: validar legalmente antes de publicar.
+
+- **Encomendas** (`#/encomendas?perfil=claro|ambar|noite`): rota por hash (funciona no GitHub Pages). É um *pedido de encomenda* de conceito: valida o formulário e mostra confirmação, **não envia dados nem processa pagamentos**. Para o tornar real, ligar o `onSubmit` em `src/components/Orders.tsx` a um serviço de formulários/email. Texto em `site.orders`.

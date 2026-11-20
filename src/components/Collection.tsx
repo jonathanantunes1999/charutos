@@ -1,6 +1,7 @@
 import { useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { site } from "../config/site.config";
 import { Picture } from "./Picture";
+import { TextLink } from "./TextLink";
 
 export function Collection() {
   const { collection: c } = site;
@@ -85,6 +86,7 @@ export function Collection() {
               </div>
             ))}
           </dl>
+          <TextLink href={`#/encomendas?perfil=${p.id}`} label={site.orders.moreInfo} className="coll__more" arrow="right" />
         </div>
       </div>
 

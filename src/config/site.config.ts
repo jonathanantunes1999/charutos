@@ -126,6 +126,29 @@ export const site = {
     ] satisfies Product[],
   },
 
+  orders: {
+    moreInfo: "Mais informação",
+    title: "Encomendar",
+    intro: "Diz-nos o que procuras e respondemos com a disponibilidade e as condições.",
+    back: { label: "Voltar à coleção", href: "#colecao" },
+    fields: {
+      profile: "Perfil",
+      quantity: "Quantidade (unidades)",
+      name: "Nome",
+      email: "Email",
+      phone: "Telefone (opcional)",
+      message: "Mensagem (opcional)",
+      adult: "Confirmo que tenho 18 anos ou mais.",
+    },
+    submit: "Enviar pedido",
+    success: {
+      title: "Pedido recebido.",
+      text: "Obrigado. Em breve entramos em contacto através do email indicado.",
+      again: "Fazer outro pedido",
+    },
+    disclaimer: "Página de conceito: o formulário não envia dados nem processa pagamentos.",
+  },
+
   craft: {
     id: "oficio",
     title: "O ofício",
