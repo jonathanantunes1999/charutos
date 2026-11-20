@@ -1206,3 +1206,13 @@ button.tlink {
     margin: 28px 0 56px -2%;
   }
 }
+
+@media (max-width: 900px) {
+  .coll__stage {
+    touch-action: pan-y;
+  }
+  /* o botão sobe para logo abaixo do nome e da frase */
+  .coll__name { order: -3; }
+  .coll__line { order: -2; }
+  .coll__more { order: -1; margin-top: -4px; }
+}

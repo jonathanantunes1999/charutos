@@ -9,6 +9,25 @@ export function Collection() {
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const p = c.products[active];
 
+  // deslizar o dedo sobre o charuto muda de perfil (só toque; o scroll vertical continua livre)
+  const swipe = useRef<{ x: number; y: number } | null>(null);
+  const go = (d: number) => {
+    const cnt = c.products.length;
+    const next = (active + d + cnt) % cnt;
+    setActive(next);
+  };
+  const onDown = (e: React.PointerEvent) => {
+    if (e.pointerType === "touch") swipe.current = { x: e.clientX, y: e.clientY };
+  };
+  const onUp = (e: React.PointerEvent) => {
+    const s0 = swipe.current;
+    swipe.current = null;
+    if (!s0) return;
+    const dx = e.clientX - s0.x;
+    const dy = e.clientY - s0.y;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) go(dx < 0 ? 1 : -1);
+  };
+
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
     const cnt = c.products.length;
     let next = active;
@@ -39,7 +58,7 @@ export function Collection() {
       </header>
 
       <div className="coll__body">
-        <div className="coll__stage">
+        <div className="coll__stage" onPointerDown={onDown} onPointerUp={onUp} onPointerCancel={() => (swipe.current = null)}>
           <div className="coll__halo" aria-hidden="true" />
           <div className="coll__word" aria-hidden="true" key={`w-${p.id}`} style={{ ["--ws" as string]: Math.min(23, 118 / n), ["--wm" as string]: Math.min(29, 138 / n) } as CSSProperties}>
             {p.word.split("").map((ch, i) => (

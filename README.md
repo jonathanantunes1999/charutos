@@ -17,7 +17,7 @@ A build usa caminhos relativos (`base: "./"`): funciona em qualquer pasta ou dom
 ## Estrutura da página
 
 1. **Hero** — palavra gigante atrás, charuto recortado a cruzar o ecrã (parallax com o rato), fumo e poeira, botão circular com texto a rodar.
-2. **Coleção** — três blocos de cor (verde, terracota, vinho); cada charuto muda cor, palavra gigante, charuto e painel. Teclado (setas, Home, End) e toque.
+2. **Coleção** — três blocos de cor (verde, terracota, vinho); cada charuto muda cor, palavra gigante, charuto e painel. Teclado (setas, Home, End), toque e, no telemóvel, deslizar o dedo sobre o charuto.
 3. **O ofício** — papel marfim; em desktop, pista horizontal fixada ao scroll; em mobile, coluna.
 4. **Fecho** — wordmark gigante, imagem e "voltar ao topo".
 
