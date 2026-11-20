@@ -1336,3 +1336,30 @@ button.tlink {
   font-style: normal;
   color: var(--ivory);
 }
+
+.footer__sep {
+  margin: 0 0.9em;
+  opacity: 0.6;
+}
+.footer__made a {
+  color: var(--ivory);
+  border-bottom: 1px solid rgba(236, 227, 210, 0.5);
+  padding: 4px 0 2px;
+  transition: border-color 0.3s;
+}
+.footer__made a:hover {
+  border-color: var(--copper);
+}
+@media (max-width: 760px) {
+  .footer__sep {
+    display: none;
+  }
+  .footer__made {
+    display: block;
+    margin-top: 6px;
+  }
+  .footer__made a {
+    display: inline-block;
+    padding: 12px 0 10px; /* alvo de toque */
+  }
+}

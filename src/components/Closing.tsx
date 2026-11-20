@@ -34,7 +34,18 @@ export function Closing() {
         <TextLink href={c.toTop.href} label={c.toTop.label} up className="end__top" />
       </section>
       <footer className="footer" ref={foot}>
-        <p className="footer__concept">{footer.concept}</p>
+        <p className="footer__concept">
+          {footer.concept}
+          <span className="footer__sep" aria-hidden="true">
+            ·
+          </span>
+          <span className="footer__made">
+            {footer.madeBy.label}{" "}
+            <a href={footer.madeBy.href} target="_blank" rel="noopener noreferrer" aria-label={`${footer.madeBy.name} (abre num novo separador)`}>
+              {footer.madeBy.name}
+            </a>
+          </span>
+        </p>
         <p className="footer__legal">
           {site.brand.full} · {footer.legal}
         </p>

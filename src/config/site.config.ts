@@ -202,6 +202,7 @@ export const site = {
 
   footer: {
     concept: "Conceito visual para apresentação",
+    madeBy: { label: "Made by", name: "Blank", href: "https://blankstudios.pt/" },
     legal: "Conteúdo ilustrativo. Destinado a maiores de 18 anos.",
   },
 };
