@@ -188,7 +188,6 @@ em {
   min-height: 620px;
   overflow: hidden;
   background: var(--ink);
-  isolation: isolate;
 }
 .hero__glow {
   position: absolute;
@@ -949,4 +948,19 @@ em {
   position: relative;
   z-index: 2;
   margin-top: auto;
+}
+
+/* viagem do charuto do hero para a coleção */
+.hero.is-traveling .hero__cigar {
+  position: fixed;
+  height: 100svh;
+}
+.coll__cigar-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.coll__head {
+  position: relative;
+  z-index: 3;
 }

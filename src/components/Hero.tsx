@@ -56,20 +56,48 @@ export function Hero() {
           off = () => window.removeEventListener("pointermove", move);
         }
 
-        // scroll
+        // scroll: o charuto viaja até à posição do charuto da coleção
+        const heroEl = root.current!;
+        heroEl.classList.add("is-traveling");
+        const box = q(".hero__cigar")[0] as HTMLElement;
+        const float = q(".hero__float")[0] as HTMLElement;
+        const landAngle = small ? -20 : -12;
+        const collWrap = document.querySelector<HTMLElement>(".coll__cigar-wrap");
+        if (collWrap) gsap.set(collWrap, { opacity: 0 });
+        // pose de aterragem (centro, escala) medida na coleção
+        const land = () => {
+          const t = document.querySelector<HTMLElement>(".coll__cigar");
+          const c = document.getElementById("colecao");
+          if (!t || !c) return { x: 0, y: 0, s: 1 };
+          const tr = t.getBoundingClientRect();
+          const cr = c.getBoundingClientRect();
+          const br = box.getBoundingClientRect();
+          return {
+            x: tr.left + tr.width / 2 - (br.left + br.width / 2),
+            y: tr.top - cr.top + tr.height / 2 - (br.top + br.height / 2),
+            s: t.offsetWidth / float.offsetWidth,
+          };
+        };
+
         const st = gsap.timeline({
           defaults: { ease: "none" },
-          scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: 0.6 },
+          scrollTrigger: { trigger: heroEl, start: "top top", end: "bottom top", scrub: 0.6, invalidateOnRefresh: true },
         });
-        st.to(q(".hero__scroll"), { xPercent: small ? 0 : -8, scale: 1.2, yPercent: small ? -8 : 4, duration: 1 }, 0)
-          .to(q(".hero__rot"), { rotate: base * 0.3, duration: 1 }, 0)
+        st.to(q(".hero__scroll"), { x: () => land().x, y: () => land().y, scale: () => land().s, ease: "power2.inOut", duration: 1 }, 0)
+          .to(q(".hero__rot"), { rotate: landAngle, ease: "power2.inOut", duration: 1 }, 0)
           .to(q(".g-l")[0], { xPercent: -45, duration: 1 }, 0)
           .to(q(".g-l")[2], { xPercent: 45, duration: 1 }, 0)
           .to(q(".g-l")[1], { yPercent: -35, opacity: 0.2, duration: 1 }, 0)
           .to(q(".hero__copy"), { y: -70, autoAlpha: 0, duration: 0.55 }, 0);
+        // passagem: o charuto do hero dá lugar ao da coleção, no mesmo sítio
+        if (collWrap) {
+          st.to(box, { autoAlpha: 0, duration: 0.1, ease: "none" }, 0.9).to(collWrap, { opacity: 1, duration: 0.1, ease: "none" }, 0.9);
+        }
 
-
-        return () => off();
+        return () => {
+          off();
+          heroEl.classList.remove("is-traveling");
+        };
       },
     );
     return () => mm.revert();

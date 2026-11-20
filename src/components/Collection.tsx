@@ -47,11 +47,13 @@ export function Collection() {
               </span>
             ))}
           </div>
-          <div className="coll__cigar" key={`c-${p.id}`}>
-            <div className="coll__cigar-in">
-              <Picture img={p.cutout} smallBelow={900} />
+          <div className="coll__cigar-wrap">
+            <div className="coll__cigar" key={`c-${p.id}`}>
+              <div className="coll__cigar-in">
+                <Picture img={p.cutout} smallBelow={900} />
+              </div>
+              <div className="coll__shadow" aria-hidden="true" />
             </div>
-            <div className="coll__shadow" aria-hidden="true" />
           </div>
         </div>
 
